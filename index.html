@@ -3,1282 +3,1313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#07090f">
+<meta name="theme-color" content="#0a0e17">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>⚡ FlashMaster Pro</title>
+<meta name="mobile-web-app-capable" content="yes">
+<title>Voice Trigger Pro</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#07090f;--bg-2:#0f1219;--card:#151a24;--card-2:#1c222e;
-  --border:#232a38;--text:#e8ecf4;--text-dim:#7d8798;
-  --accent:#fbbf24;--accent-2:#f59e0b;--danger:#ef4444;
-  --success:#10b981;--info:#3b82f6;--radius:14px;
-  --shadow:0 4px 20px rgba(0,0,0,.4);
+  --bg:#0a0e17;--bg-2:#0f1420;--card:#151b28;--card-2:#1c2434;
+  --border:#252e40;--text:#e8ecf4;--text-dim:#7d8798;
+  --accent:#22d3ee;--accent-2:#06b6d4;--danger:#ef4444;--success:#10b981;
+  --warn:#fbbf24;--radius:16px;
 }
 [data-theme="light"]{
   --bg:#f1f5f9;--bg-2:#fff;--card:#fff;--card-2:#f8fafc;
   --border:#e2e8f0;--text:#0f172a;--text-dim:#64748b;
 }
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-  background:var(--bg);color:var(--text);user-select:none;
+  background:var(--bg);color:var(--text);user-select:none;-webkit-user-select:none;
   -webkit-font-smoothing:antialiased;transition:background .3s,color .3s;
 }
-button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
-input,select{font:inherit;color:inherit}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;touch-action:manipulation}
+input,select,textarea{font:inherit;color:inherit}
 
 /* === LIGHT OVERLAY === */
 .light-overlay{
-  position:fixed;inset:0;background:#fff;opacity:0;
-  pointer-events:none;z-index:9000;display:none;
-  transition:opacity .04s linear;
+  position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;
+  z-index:9000;transition:opacity .03s linear;
 }
-.light-overlay.active{display:block}
-.light-overlay.on{opacity:1}
 
-/* === FLOATING BAR === */
-.floating-bar{
-  position:fixed;bottom:max(24px,env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%) translateY(120%);
-  z-index:10000;display:flex;gap:10px;
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
-  pointer-events:none;
+/* === FEEDBACK PULSE === */
+.pulse-feedback{
+  position:fixed;inset:0;pointer-events:none;z-index:8500;
+  background:radial-gradient(circle,rgba(34,211,238,.35),transparent 70%);
+  opacity:0;transition:opacity .15s;
 }
-.floating-bar.visible{transform:translateX(-50%) translateY(0);pointer-events:auto}
-.btn-stop{
-  background:rgba(239,68,68,.95);color:#fff;
-  padding:14px 32px;border-radius:50px;font-weight:700;
-  font-size:16px;letter-spacing:.5px;box-shadow:0 8px 32px rgba(239,68,68,.5);
-  backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);
-}
-.btn-stop:active{transform:scale(.95)}
+.pulse-feedback.active{opacity:1;transition:opacity .05s}
 
-/* === APP LAYOUT === */
+/* === TOAST === */
+.toast{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);
+  background:var(--card);border:1px solid var(--border);padding:12px 20px;
+  border-radius:12px;font-size:13px;font-weight:600;z-index:11000;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  max-width:88vw;text-align:center;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* === APP === */
 .app{height:100%;display:flex;flex-direction:column}
-body.light-mode .app{visibility:hidden}
 
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px;background:var(--bg-2);border-bottom:1px solid var(--border);
-  gap:12px;flex-shrink:0;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  background:var(--bg-2);border-bottom:1px solid var(--border);
+  gap:10px;flex-shrink:0;
 }
-.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .logo{
-  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  display:grid;place-items:center;font-size:22px;
-  box-shadow:0 4px 16px rgba(251,191,36,.35);
+  display:grid;place-items:center;font-size:20px;
+  box-shadow:0 4px 16px rgba(34,211,238,.35);
 }
-.brand h1{font-size:16px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand .sub{font-size:11px;color:var(--text-dim);margin-top:1px}
-.status{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.brand-text{min-width:0}
+.brand h1{font-size:15px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand .sub{font-size:10px;color:var(--text-dim);margin-top:1px}
 .chip{
   display:flex;align-items:center;gap:4px;padding:6px 10px;
   background:var(--card);border:1px solid var(--border);border-radius:20px;
-  font-size:11px;font-weight:600;color:var(--text-dim);
+  font-size:11px;font-weight:600;color:var(--text-dim);flex-shrink:0;
 }
-.chip.active{color:var(--accent);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1)}
-.icon-btn{
-  width:38px;height:38px;border-radius:11px;background:var(--card);
-  border:1px solid var(--border);display:grid;place-items:center;font-size:16px;
-  transition:all .2s;
-}
-.icon-btn:active{transform:scale(.92)}
-.icon-btn.active{background:rgba(251,191,36,.15);border-color:var(--accent);color:var(--accent)}
+.chip.active{color:var(--success);border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1)}
 
 /* === TABS === */
 .tabs{
-  display:flex;gap:4px;padding:10px 14px;background:var(--bg-2);
+  display:flex;gap:4px;padding:8px 10px;background:var(--bg-2);
   border-bottom:1px solid var(--border);overflow-x:auto;
   scrollbar-width:none;flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
 }
 .tabs::-webkit-scrollbar{display:none}
 .tab{
-  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;
+  padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;
   color:var(--text-dim);white-space:nowrap;transition:all .2s;
+  flex-shrink:0;display:flex;align-items:center;gap:4px;
 }
-.tab.active{background:var(--accent);color:#000;box-shadow:0 2px 12px rgba(251,191,36,.3)}
+.tab.active{background:var(--accent);color:#0a0e17;box-shadow:0 2px 10px rgba(34,211,238,.35)}
 
 /* === CONTENT === */
-.content{flex:1;overflow-y:auto;padding:16px;scroll-behavior:smooth}
-.content::-webkit-scrollbar{width:6px}
-.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.tab-panel{display:none;animation:fade .3s ease}
+.content{
+  flex:1;overflow-y:auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling:touch;
+}
+.tab-panel{display:none;animation:fade .25s ease}
 .tab-panel.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 .card{
   background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:18px;margin-bottom:14px;
-  transition:border-color .2s;
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;
 }
 .card-title{
-  font-size:12px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.8px;color:var(--text-dim);margin-bottom:14px;
-  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--text-dim);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
 }
 .card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* === BIG LISTEN BUTTON === */
+.listen-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 0 10px;
+}
+.listen-btn{
+  width:180px;height:180px;border-radius:50%;
+  display:grid;place-items:center;font-size:64px;
+  background:radial-gradient(circle at 30% 30%,var(--card-2),var(--card));
+  border:3px solid var(--border);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.listen-btn:active{transform:scale(.94)}
+.listen-btn.listening{
+  background:radial-gradient(circle at 30% 30,#67e8f9,var(--accent-2));
+  border-color:var(--accent);color:#0a0e17;
+  box-shadow:0 0 60px rgba(34,211,238,.7);
+  animation:listenPulse 1.5s ease-in-out infinite;
+}
+@keyframes listenPulse{
+  0%,100%{box-shadow:0 0 60px rgba(34,211,238,.7),inset 0 0 30px rgba(255,255,255,.2)}
+  50%{box-shadow:0 0 100px rgba(34,211,238,1),inset 0 0 40px rgba(255,255,255,.4)}
+}
+.listen-label{
+  margin-top:18px;font-size:18px;font-weight:800;letter-spacing:.3px;
+}
+.listen-sub{
+  margin-top:6px;font-size:12px;color:var(--text-dim);text-align:center;
+  padding:0 20px;line-height:1.5;
+}
+
+/* === STATUS === */
+.status-bar{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 16px;background:var(--bg);border-radius:12px;
+  margin-bottom:12px;font-size:12px;font-weight:600;color:var(--text-dim);
+}
+.status-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--text-dim);
+  flex-shrink:0;
+}
+.status-dot.green{background:var(--success);box-shadow:0 0 10px var(--success);animation:blink 1.5s infinite}
+.status-dot.red{background:var(--danger)}
+.status-dot.yellow{background:var(--warn);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.4}}
+
+/* === TRANSCRIPT === */
+.transcript-box{
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;
+  padding:12px;min-height:60px;font-size:13px;line-height:1.5;
+  color:var(--text);word-break:break-word;margin-bottom:12px;
+}
+.transcript-box .label{
+  font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--text-dim);
+  text-transform:uppercase;margin-bottom:4px;
+}
+.transcript-box .interim{opacity:.6;font-style:italic;color:var(--text-dim)}
+.transcript-box .matched{color:var(--success);font-weight:700}
 
 /* === BUTTONS === */
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 20px;border-radius:12px;font-weight:700;font-size:15px;
+  padding:14px 18px;border-radius:12px;font-weight:700;font-size:15px;
   background:var(--card-2);border:1px solid var(--border);
-  transition:all .15s;width:100%;
+  transition:transform .12s;width:100%;
 }
 .btn:active{transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#000;border:none;box-shadow:0 4px 20px rgba(251,191,36,.3)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0a0e17;border:none;box-shadow:0 4px 20px rgba(34,211,238,.3)}
 .btn-danger{background:var(--danger);color:#fff;border:none}
 .btn-success{background:var(--success);color:#fff;border:none}
-.btn-ghost{background:transparent}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn-warn{background:var(--warn);color:#0a0e17;border:none}
+.btn-sm{padding:10px 14px;font-size:13px;width:auto}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
-/* === POWER BUTTON === */
-.power-btn{
-  width:140px;height:140px;border-radius:50%;margin:0 auto 18px;
-  display:grid;place-items:center;
-  background:radial-gradient(circle at 30% 30%,var(--card-2),var(--card));
-  border:3px solid var(--border);font-size:56px;
-  transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  position:relative;
+/* === INPUTS === */
+.input{
+  width:100%;padding:13px 14px;border-radius:11px;background:var(--bg);
+  border:1px solid var(--border);font-size:15px;color:var(--text);
+  outline:none;transition:border-color .15s;
 }
-.power-btn:active{transform:scale(.93)}
-.power-btn.on{
-  background:radial-gradient(circle at 30% 30%,#fde68a,var(--accent));
-  border-color:var(--accent);color:#000;
-  box-shadow:0 0 60px rgba(251,191,36,.6),inset 0 0 40px rgba(255,255,255,.3);
+.input:focus{border-color:var(--accent)}
+.input-row{display:flex;gap:8px;margin-bottom:10px}
+.input-row .input{flex:1}
+
+/* === LIST ITEMS === */
+.list-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 14px;background:var(--bg);border-radius:11px;
+  margin-bottom:8px;gap:10px;
+}
+.list-item .main{flex:1;min-width:0}
+.list-item .title{font-size:14px;font-weight:700;word-break:break-word}
+.list-item .sub{font-size:11px;color:var(--text-dim);margin-top:2px;word-break:break-all}
+.list-item .actions{display:flex;gap:6px;flex-shrink:0}
+.mini-btn{
+  width:36px;height:36px;border-radius:9px;background:var(--card);
+  border:1px solid var(--border);display:grid;place-items:center;font-size:15px;
+  transition:transform .12s;
+}
+.mini-btn:active{transform:scale(.9)}
+.mini-btn.danger{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--danger)}
+.empty{
+  text-align:center;padding:24px 12px;color:var(--text-dim);
+  font-size:13px;line-height:1.6;
 }
 
 /* === SLIDERS === */
-.slider-group{margin-bottom:16px}
+.slider-group{margin-bottom:14px}
 .slider-label{
   display:flex;justify-content:space-between;align-items:center;
   font-size:13px;font-weight:600;margin-bottom:8px;
 }
 .slider-label .val{
   color:var(--accent);font-variant-numeric:tabular-nums;
-  background:rgba(251,191,36,.1);padding:2px 10px;border-radius:8px;font-size:12px;
+  background:rgba(34,211,238,.1);padding:2px 10px;border-radius:8px;font-size:12px;
 }
 input[type="range"]{
   -webkit-appearance:none;width:100%;height:8px;border-radius:4px;
   background:var(--border);outline:none;
 }
 input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
   background:var(--accent);cursor:pointer;
-  box-shadow:0 2px 10px rgba(251,191,36,.5);border:2px solid #fff;
-}
-input[type="range"]::-moz-range-thumb{
-  width:22px;height:22px;border-radius:50%;background:var(--accent);
-  cursor:pointer;border:2px solid #fff;box-shadow:0 2px 10px rgba(251,191,36,.5);
+  box-shadow:0 2px 10px rgba(34,211,238,.5);border:2px solid #fff;
 }
 
-/* === COLOR PICKER === */
-.color-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.color-input{
-  width:56px;height:56px;padding:0;border:none;border-radius:12px;
-  cursor:pointer;background:transparent;flex-shrink:0;
-}
-.color-input::-webkit-color-swatch-wrapper{padding:0}
-.color-input::-webkit-color-swatch{border:2px solid var(--border);border-radius:12px}
-.color-presets{display:flex;gap:8px;flex-wrap:wrap;flex:1}
-.color-preset{
-  width:32px;height:32px;border-radius:8px;border:2px solid var(--border);
-  transition:transform .15s;
-}
-.color-preset:active{transform:scale(.88)}
-
-/* === METER === */
-.meter{
-  height:14px;background:var(--bg);border-radius:7px;overflow:hidden;
-  position:relative;margin-bottom:8px;border:1px solid var(--border);
-}
-.meter-fill{
-  height:100%;width:0%;border-radius:7px;transition:width .05s linear;
-  background:linear-gradient(90deg,#10b981,#fbbf24,#ef4444);
-}
-.meter-threshold{
-  position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;
-  box-shadow:0 0 6px rgba(255,255,255,.8);border-radius:1px;
-  transition:left .1s;
-}
-.meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:14px}
-
-#spectrum{
-  width:100%;height:70px;border-radius:10px;
-  background:var(--bg);margin-bottom:12px;display:block;
-}
-
-/* === PATTERNS GRID === */
-.pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pattern-btn{
-  padding:16px 12px;border-radius:12px;background:var(--card-2);
-  border:1px solid var(--border);font-size:13px;font-weight:600;
-  transition:all .15s;display:flex;flex-direction:column;
-  align-items:center;gap:6px;
-}
-.pattern-btn:active{transform:scale(.95)}
-.pattern-btn:hover{border-color:var(--accent)}
-.pattern-btn .emoji{font-size:24px}
-.pattern-btn.active{
-  background:rgba(251,191,36,.15);border-color:var(--accent);color:var(--accent);
-}
-
-/* === SELECT / TOGGLE === */
-select{
-  width:100%;padding:12px;border-radius:10px;background:var(--bg);
-  border:1px solid var(--border);margin-bottom:12px;
-}
+/* === TOGGLE === */
 .toggle-row{
   display:flex;justify-content:space-between;align-items:center;
-  padding:12px 0;border-bottom:1px solid var(--border);
+  padding:13px 0;border-bottom:1px solid var(--border);
 }
 .toggle-row:last-child{border-bottom:none}
 .toggle-row .label{font-size:14px;font-weight:600}
 .toggle-row .desc{font-size:11px;color:var(--text-dim);margin-top:2px}
 .switch{
-  position:relative;width:48px;height:28px;border-radius:14px;
+  position:relative;width:50px;height:30px;border-radius:15px;
   background:var(--border);transition:background .2s;flex-shrink:0;
 }
 .switch::after{
-  content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;
+  content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;
   border-radius:50%;background:#fff;transition:transform .2s;
   box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
 .switch.on{background:var(--accent)}
 .switch.on::after{transform:translateX(20px)}
 
+/* === SELECT === */
+select.input{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237d8798' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:38px;
+}
+
+/* === COLOR === */
+.color-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.color-input{
+  width:52px;height:52px;padding:0;border:none;border-radius:12px;
+  cursor:pointer;background:transparent;flex-shrink:0;
+}
+.color-input::-webkit-color-swatch-wrapper{padding:0}
+.color-input::-webkit-color-swatch{border:2px solid var(--border);border-radius:12px}
+.color-presets{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.color-preset{
+  width:32px;height:32px;border-radius:8px;border:2px solid var(--border);
+}
+.color-preset:active{transform:scale(.88)}
+
 /* === STATS === */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stat{
-  background:var(--bg);border-radius:10px;padding:14px;text-align:center;
+  background:var(--bg);border-radius:11px;padding:13px;text-align:center;
   border:1px solid var(--border);
 }
-.stat .num{font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-.stat .lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.stat .num{font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700}
 
-/* === TOAST === */
-.toast{
-  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
-  background:var(--card);border:1px solid var(--border);padding:12px 20px;
-  border-radius:12px;font-size:13px;font-weight:600;z-index:11000;
-  box-shadow:var(--shadow);transition:transform .3s cubic-bezier(.34,1.56,.64,1);
-  max-width:90vw;
+/* === QUICK CHIPS === */
+.quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-chip{
+  padding:8px 14px;background:var(--card-2);border:1px solid var(--border);
+  border-radius:20px;font-size:12px;font-weight:600;
 }
-.toast.show{transform:translateX(-50%) translateY(0)}
+.quick-chip:active{transform:scale(.94);border-color:var(--accent)}
 
-/* === COUNTDOWN === */
-.countdown-overlay{
-  position:fixed;inset:0;z-index:9500;
-  display:grid;place-items:center;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
-  font-size:140px;font-weight:800;color:var(--accent);
-  animation:countPop 1s ease-out infinite;
+/* === AUDIO PREVIEW === */
+.audio-info{
+  display:flex;align-items:center;gap:10px;padding:12px;
+  background:var(--bg);border-radius:11px;margin-bottom:10px;
+  border:1px solid var(--border);
 }
-@keyframes countPop{
-  0%{transform:scale(.5);opacity:0}
-  30%{transform:scale(1.1);opacity:1}
-  100%{transform:scale(1);opacity:.8}
+.audio-icon{
+  width:40px;height:40px;border-radius:10px;background:var(--accent);
+  color:#0a0e17;display:grid;place-items:center;font-size:18px;flex-shrink:0;
 }
+.audio-info .main{flex:1;min-width:0}
+.audio-info .title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audio-info .sub{font-size:11px;color:var(--text-dim);margin-top:2px}
 
-/* === FEATURE LIST === */
-.feature-list{
-  display:grid;grid-template-columns:1fr;gap:6px;
-  font-size:12px;color:var(--text-dim);
+/* === FILE UPLOAD === */
+.file-input{display:none}
+.file-label{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:16px;border:2px dashed var(--border);border-radius:12px;
+  cursor:pointer;font-size:14px;font-weight:600;color:var(--text-dim);
+  transition:border-color .2s;text-align:center;
 }
-.feature-list li{
-  padding:6px 10px;background:var(--bg);border-radius:8px;
-  border-left:3px solid var(--accent);list-style:none;
-}
+.file-label:active{border-color:var(--accent);color:var(--accent)}
 
-/* === KBD === */
-kbd{
-  background:var(--bg);padding:2px 7px;border-radius:5px;
-  font-family:monospace;font-size:11px;border:1px solid var(--border);
+/* === HISTORY === */
+.history-item{
+  display:flex;gap:10px;padding:11px 12px;background:var(--bg);
+  border-radius:10px;margin-bottom:6px;align-items:center;
 }
+.history-item .icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(16,185,129,.15);color:var(--success);
+  display:grid;place-items:center;font-size:14px;flex-shrink:0;
+}
+.history-item .main{flex:1;min-width:0}
+.history-item .word{font-size:13px;font-weight:700;color:var(--success)}
+.history-item .transcript{font-size:11px;color:var(--text-dim);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-item .time{font-size:10px;color:var(--text-dim);flex-shrink:0}
 
 /* === MISC === */
-.hidden{display:none!important}
-.hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:8px}
+.hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:6px}
 .gap{height:8px}
+.hidden{display:none!important}
+.warning-box{
+  padding:12px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);
+  border-radius:11px;font-size:12px;color:var(--warn);line-height:1.5;
+  margin-bottom:12px;
+}
 </style>
 </head>
 <body data-theme="dark">
 
-<div id="lightOverlay" class="light-overlay"></div>
-<div id="floatingBar" class="floating-bar">
-  <button id="btnStopLight" class="btn-stop">✕ STOP</button>
-</div>
+<div class="light-overlay" id="lightOverlay"></div>
+<div class="pulse-feedback" id="pulseFeedback"></div>
+<div class="toast" id="toast"></div>
 
-<div class="app" id="app">
+<div class="app">
   <header class="topbar">
     <div class="brand">
-      <div class="logo">⚡</div>
-      <div>
-        <h1>FlashMaster Pro</h1>
-        <div class="sub">Ultimate Flashlight Toolkit</div>
+      <div class="logo">🎙️</div>
+      <div class="brand-text">
+        <h1>Voice Trigger Pro</h1>
+        <div class="sub">Ucapkan kata → aksi otomatis</div>
       </div>
     </div>
-    <div class="status">
-      <div class="chip" id="chipBattery">🔋 --</div>
-      <div class="chip" id="chipWake">💤</div>
-      <button class="icon-btn" id="btnTheme" title="Theme">🌙</button>
-      <button class="icon-btn" id="btnFullscreen" title="Fullscreen">⛶</button>
-    </div>
+    <div class="chip" id="chipBattery">🔋 --</div>
   </header>
 
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-tab="main">⚡ Main</button>
-    <button class="tab" data-tab="strobe">💥 Strobe</button>
-    <button class="tab" data-tab="sound">🎤 Sound</button>
-    <button class="tab" data-tab="patterns">🎨 Patterns</button>
-    <button class="tab" data-tab="tools">🛠️ Tools</button>
-    <button class="tab" data-tab="about">📋 Info</button>
+    <button class="tab active" data-tab="listen">🎤 Dengar</button>
+    <button class="tab" data-tab="words">📝 Kata</button>
+    <button class="tab" data-tab="action">⚡ Aksi</button>
+    <button class="tab" data-tab="history">📜 Riwayat</button>
+    <button class="tab" data-tab="settings">⚙️ Setelan</button>
   </nav>
 
   <main class="content">
-    <!-- ===== MAIN ===== -->
-    <section class="tab-panel active" id="tab-main">
+
+    <!-- ===== LISTEN TAB ===== -->
+    <section class="tab-panel active" id="tab-listen">
+      <div class="status-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Belum aktif</span>
+      </div>
+
+      <div class="listen-wrap">
+        <button class="listen-btn" id="listenBtn">🎤</button>
+        <div class="listen-label" id="listenLabel">Tekan untuk Mulai</div>
+        <div class="listen-sub" id="listenSub">Aplikasi akan mendengar kata pemicu</div>
+      </div>
+
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Master Light Control</div>
-        <button class="power-btn" id="powerBtn">🔌</button>
+        <div class="card-title"><span class="dot"></span>Transkrip Langsung</div>
+        <div class="transcript-box" id="transcriptBox">
+          <div class="label">Yang terdengar:</div>
+          <div id="transcriptText">— belum ada suara —</div>
+        </div>
         <div class="btn-row">
-          <button class="btn" id="btnTorch">🔦 Torch</button>
-          <button class="btn" id="btnScreen">💡 Screen</button>
-        </div>
-        <div class="hint">Tap the big button for full white light. Torch uses your device's camera flash (mobile).</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Screen Light Settings</div>
-        <div class="color-row">
-          <input type="color" class="color-input" id="colorPicker" value="#ffffff">
-          <div class="color-presets" id="colorPresets"></div>
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Brightness</span><span class="val" id="brightnessVal">100%</span></div>
-          <input type="range" id="brightness" min="1" max="100" value="100">
+          <button class="btn btn-sm" id="btnTestTrigger">🧪 Tes Pemicu</button>
+          <button class="btn btn-sm" id="btnStopAll">⏹ Stop Semua</button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Quick Presets</div>
-        <div class="btn-row-3">
-          <button class="btn" data-quick="#ffffff">⚪ White</button>
-          <button class="btn" data-quick="#ff0000">🔴 Red</button>
-          <button class="btn" data-quick="#00ff00">🟢 Green</button>
-        </div>
-        <div class="gap"></div>
-        <div class="btn-row-3">
-          <button class="btn" data-quick="#0000ff">🔵 Blue</button>
-          <button class="btn" data-quick="#ffff00">🟡 Yellow</button>
-          <button class="btn" data-quick="#ff00ff">🟣 Magenta</button>
+        <div class="card-title"><span class="dot"></span>Kata Pemicu Aktif</div>
+        <div id="activeWordsList"><div class="empty">Belum ada kata. Tambahkan di tab "Kata".</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Ringkasan</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="num" id="statTriggers">0</div><div class="lbl">Total Pemicu</div></div>
+          <div class="stat"><div class="num" id="statWords">0</div><div class="lbl">Kata Aktif</div></div>
         </div>
       </div>
     </section>
 
-    <!-- ===== STROBE ===== -->
-    <section class="tab-panel" id="tab-strobe">
+    <!-- ===== WORDS TAB ===== -->
+    <section class="tab-panel" id="tab-words">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Strobe Configuration</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>ON Duration</span><span class="val" id="onMsVal">80 ms</span></div>
-          <input type="range" id="onMs" min="10" max="2000" value="80" step="10">
+        <div class="card-title"><span class="dot"></span>Tambah Kata Pemicu</div>
+        <div class="input-row">
+          <input type="text" class="input" id="wordInput" placeholder="contoh: halo, tolong, bantuan" autocomplete="off" autocorrect="off">
+          <button class="btn btn-primary btn-sm" id="btnAddWord" style="padding:0 20px">+</button>
         </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>OFF Duration</span><span class="val" id="offMsVal">120 ms</span></div>
-          <input type="range" id="offMs" min="10" max="2000" value="120" step="10">
+        <div class="quick-chips">
+          <button class="quick-chip" data-quick-word="halo">+ halo</button>
+          <button class="quick-chip" data-quick-word="tolong">+ tolong</button>
+          <button class="quick-chip" data-quick-word="bantuan">+ bantuan</button>
+          <button class="quick-chip" data-quick-word="sos">+ SOS</button>
+          <button class="quick-chip" data-quick-word="buka">+ buka</button>
+          <button class="quick-chip" data-quick-word="main">+ main</button>
         </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Frequency</span><span class="val" id="freqVal">5.0 Hz</span></div>
-          <div class="hint">Adjust both durations to change frequency. Lower = slower, higher = faster.</div>
-        </div>
-        <button class="btn btn-primary" id="btnStartStrobe">💥 START STROBE</button>
-        <div class="gap"></div>
-        <div class="btn-row-3">
-          <button class="btn" data-strobe="200,400">🐢 Slow</button>
-          <button class="btn" data-strobe="80,120">🚶 Medium</button>
-          <button class="btn" data-strobe="30,30">⚡ Fast</button>
-        </div>
+        <div class="hint">Kata tidak peka huruf besar/kecil. Bisa tambah banyak kata.</div>
       </div>
-    </section>
 
-    <!-- ===== SOUND ===== -->
-    <section class="tab-panel" id="tab-sound">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Microphone Setup</div>
-        <select id="micSelect">
-          <option value="">Default Microphone</option>
+        <div class="card-title"><span class="dot"></span>Daftar Kata Pemicu (<span id="wordCount">0</span>)</div>
+        <div id="wordsList"><div class="empty">Belum ada kata pemicu.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Mode Pencocokan</div>
+        <select class="input" id="matchMode">
+          <option value="contains">Mengandung kata (paling mudah)</option>
+          <option value="exact">Harus persis sama</option>
+          <option value="fuzzy">Mirip (toleran salah ucap)</option>
         </select>
-        <button class="btn" id="btnTestMic">🎤 ENABLE MIC / TEST</button>
+        <div class="slider-group" id="fuzzyGroup" style="display:none;margin-top:12px">
+          <div class="slider-label"><span>Toleransi Kemiripan</span><span class="val" id="fuzzyVal">1</span></div>
+          <input type="range" id="fuzzyTolerance" min="1" max="3" value="1">
+        </div>
+        <div class="hint">"Mengandung" = paling aman. "Mirip" = kalau pengucapan agak meleset.</div>
+      </div>
+    </section>
+
+    <!-- ===== ACTION TAB ===== -->
+    <section class="tab-panel" id="tab-action">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Suara MP3</div>
+        <label class="file-label" for="audioFile">
+          🎵 Pilih / Ganti File MP3
+        </label>
+        <input type="file" class="file-input" id="audioFile" accept="audio/*">
         <div class="gap"></div>
-        <div class="meter"><div class="meter-fill" id="meterFill"></div><div class="meter-threshold" id="meterThresh" style="left:15%"></div></div>
-        <div class="meter-labels"><span>Silent</span><span>Loud</span></div>
-        <canvas id="spectrum"></canvas>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Sound Reactivity</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Sensitivity Threshold</span><span class="val" id="thresholdVal">8%</span></div>
-          <input type="range" id="threshold" min="1" max="80" value="8">
+        <div class="input-row">
+          <input type="url" class="input" id="audioUrl" placeholder="atau tempel URL MP3 di sini">
+          <button class="btn btn-sm" id="btnLoadUrl" style="padding:0 16px">→</button>
         </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Flash Duration</span><span class="val" id="flashMsVal">120 ms</span></div>
-          <input type="range" id="flashMs" min="20" max="2000" value="120" step="10">
-        </div>
-        <button class="btn btn-primary" id="btnStartSound">🔊 ACTIVATE SOUND LIGHT</button>
-        <div class="hint">The light will flash whenever sound exceeds the threshold. Great for parties, clap-to-light, etc.</div>
-      </div>
-    </section>
-
-    <!-- ===== PATTERNS ===== -->
-    <section class="tab-panel" id="tab-patterns">
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Light Patterns</div>
-        <div class="pattern-grid" id="patternGrid"></div>
-        <div class="hint">Tap any pattern to start. Light will cycle through the pattern continuously.</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Pattern Speed</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Speed Multiplier</span><span class="val" id="speedVal">1.0x</span></div>
-          <input type="range" id="patternSpeed" min="25" max="300" value="100">
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== TOOLS ===== -->
-    <section class="tab-panel" id="tab-tools">
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Session Tools</div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Keep Screen Awake</div>
-            <div class="desc">Prevents screen from sleeping</div>
+        <div id="audioInfo" class="hidden">
+          <div class="audio-info">
+            <div class="audio-icon">🎵</div>
+            <div class="main">
+              <div class="title" id="audioName">—</div>
+              <div class="sub" id="audioSize">—</div>
+            </div>
+            <button class="mini-btn" id="btnPreviewAudio">▶</button>
           </div>
-          <div class="switch" id="swWake"></div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Volume</span><span class="val" id="volumeVal">100%</span></div>
+          <input type="range" id="volume" min="0" max="100" value="100">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Ulangi Suara</span><span class="val" id="repeatVal">1x</span></div>
+          <input type="range" id="repeat" min="1" max="10" value="1">
         </div>
         <div class="toggle-row">
           <div>
-            <div class="label">Vibration Feedback</div>
-            <div class="desc">Vibrate on mode activation</div>
+            <div class="label">Mainkan MP3 saat kata terdeteksi</div>
+            <div class="desc">Suara otomatis diputar</div>
+          </div>
+          <div class="switch on" id="swAudioOn"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Pause mic saat audio main</div>
+            <div class="desc">Hindari audio menangkap suaranya sendiri</div>
+          </div>
+          <div class="switch on" id="swPauseMic"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Flash / Lampu</div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Nyalakan lampu saat terdeteksi</div>
+            <div class="desc">Aktifkan flash otomatis</div>
+          </div>
+          <div class="switch on" id="swLightOn"></div>
+        </div>
+        <div class="gap"></div>
+        <div class="card-title" style="margin-top:8px">Mode Flash</div>
+        <select class="input" id="flashMode">
+          <option value="torch">🔦 Torch (kamera flash)</option>
+          <option value="screen" selected>💡 Layar putih</option>
+          <option value="strobe">💥 Strobe (kedip)</option>
+          <option value="both">🔦💡 Torch + Layar</option>
+        </select>
+        <div class="gap"></div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Durasi Flash</span><span class="val" id="flashDurVal">1.5 detik</span></div>
+          <input type="range" id="flashDur" min="200" max="10000" value="1500" step="100">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Kecepatan Strobe</span><span class="val" id="strobeSpeedVal">Sedang</span></div>
+          <input type="range" id="strobeSpeed" min="1" max="10" value="5">
+        </div>
+        <div class="color-row">
+          <input type="color" class="color-input" id="flashColor" value="#ffffff">
+          <div class="color-presets" id="flashColorPresets"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-sm" id="btnTestLight">🔦 Tes Lampu</button>
+          <button class="btn btn-sm" id="btnStopLight">⏹ Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Getar & Suara Balasan</div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Getar saat terdeteksi</div>
+            <div class="desc">HP bergetar tanda kata tertangkap</div>
           </div>
           <div class="switch on" id="swVibrate"></div>
         </div>
         <div class="toggle-row">
           <div>
-            <div class="label">Countdown</div>
-            <div class="desc">3-second countdown before start</div>
+            <div class="label">Suara balasan (TTS)</div>
+            <div class="desc">HP mengucapkan kata yang terdeteksi</div>
           </div>
-          <div class="switch" id="swCountdown"></div>
+          <div class="switch" id="swTts"></div>
         </div>
       </div>
+    </section>
 
+    <!-- ===== HISTORY TAB ===== -->
+    <section class="tab-panel" id="tab-history">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Auto-Stop Timer</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Auto-Stop After</span><span class="val" id="autoStopVal">Off</span></div>
-          <input type="range" id="autoStop" min="0" max="300" value="0" step="10">
-        </div>
-        <div class="hint">0 = disabled. Otherwise light turns off automatically after set seconds.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Statistics</div>
+        <div class="card-title"><span class="dot"></span>Statistik</div>
         <div class="stats-grid">
-          <div class="stat"><div class="num" id="statBlinks">0</div><div class="lbl">Flashes</div></div>
-          <div class="stat"><div class="num" id="statRuntime">0s</div><div class="lbl">Runtime</div></div>
-          <div class="stat"><div class="num" id="statFreq">0</div><div class="lbl">Peak Hz</div></div>
-          <div class="stat"><div class="num" id="statBattery">--</div><div class="lbl">Battery</div></div>
+          <div class="stat"><div class="num" id="hTotal">0</div><div class="lbl">Total Pemicu</div></div>
+          <div class="stat"><div class="num" id="hToday">0</div><div class="lbl">Hari Ini</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Riwayat Terakhir</div>
+        <div id="historyList"><div class="empty">Belum ada riwayat. Coba pemicu dulu.</div></div>
+        <div class="gap"></div>
+        <div class="btn-row">
+          <button class="btn btn-sm" id="btnExportHistory">📤 Ekspor</button>
+          <button class="btn btn-sm btn-danger" id="btnClearHistory">🗑 Hapus</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SETTINGS TAB ===== -->
+    <section class="tab-panel" id="tab-settings">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Bahasa Pengenalan</div>
+        <select class="input" id="langSelect">
+          <option value="id-ID">🇮🇩 Bahasa Indonesia</option>
+          <option value="en-US">🇺🇸 English (US)</option>
+          <option value="en-GB">🇬🇧 English (UK)</option>
+          <option value="ms-MY">🇲🇾 Bahasa Melayu</option>
+          <option value="zh-CN">🇨🇳 中文</option>
+          <option value="ja-JP">🇯🇵 日本語</option>
+        </select>
+        <div class="hint">Ganti bahasa jika kata pemicu dalam bahasa lain.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Perilaku</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Jeda antar pemicu</span><span class="val" id="cooldownVal">3 detik</span></div>
+          <input type="range" id="cooldown" min="0" max="30" value="3">
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Tetap menyala (Wake Lock)</div>
+            <div class="desc">Cegah layar tidur selama mendengar</div>
+          </div>
+          <div class="switch" id="swWake"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Lanjutkan otomatis</div>
+            <div class="desc">Dengar lagi setelah audio/main flash</div>
+          </div>
+          <div class="switch on" id="swContinuous"></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Presets</div>
+        <div class="card-title"><span class="dot"></span>Simpan & Backup</div>
         <div class="btn-row">
-          <button class="btn" id="btnSavePreset">💾 Save</button>
-          <button class="btn" id="btnLoadPreset">📂 Load</button>
+          <button class="btn btn-sm" id="btnSaveAll">💾 Simpan Semua</button>
+          <button class="btn btn-sm" id="btnLoadAll">📂 Muat</button>
         </div>
         <div class="gap"></div>
         <div class="btn-row">
-          <button class="btn" id="btnExport">📤 Export</button>
-          <button class="btn" id="btnImport">📥 Import</button>
+          <button class="btn btn-sm" id="btnExportAll">📤 Ekspor File</button>
+          <button class="btn btn-sm" id="btnImportAll">📥 Impor File</button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Keyboard Shortcuts</div>
-        <div class="feature-list">
-          <li><kbd>Space</kbd> Toggle light on/off</li>
-          <li><kbd>F</kbd> Toggle fullscreen</li>
-          <li><kbd>S</kbd> Start/stop strobe</li>
-          <li><kbd>Esc</kbd> Stop all modes</li>
-          <li><kbd>T</kbd> Toggle theme</li>
-          <li><kbd>1-6</kbd> Switch tabs</li>
+        <div class="card-title"><span class="dot"></span>Tampilan</div>
+        <div class="btn-row">
+          <button class="btn btn-sm" id="btnTheme">🌙 Mode Gelap</button>
+          <button class="btn btn-sm btn-danger" id="btnReset">🔄 Reset Semua</button>
         </div>
       </div>
-    </section>
 
-    <!-- ===== ABOUT ===== -->
-    <section class="tab-panel" id="tab-about">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>About FlashMaster Pro</div>
-        <p style="font-size:13px;line-height:1.7;color:var(--text-dim)">
-          A powerful all-in-one flashlight toolkit that works entirely in your browser.
-          No installation, no tracking, no ads. Everything runs locally on your device.
+        <div class="card-title"><span class="dot"></span>Tentang Aplikasi</div>
+        <p style="font-size:12px;color:var(--text-dim);line-height:1.6">
+          Voice Trigger Pro — aplikasi web yang mendengar kata pemicu melalui mikrofon HP.
+          Saat kata terdeteksi, aplikasi bisa memutar MP3, menyalakan flash, bergetar, dan lain-lain.
+          Semua data tersimpan di HP kamu, tidak ada yang dikirim ke server.
         </p>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Complete Feature List (40+)</div>
-        <ul class="feature-list">
-          <li>✓ Fullscreen mode</li>
-          <li>✓ Device torch (camera flash) control</li>
-          <li>✓ Full-screen colored light</li>
-          <li>✓ Brightness slider (1-100%)</li>
-          <li>✓ Color picker + 6 presets</li>
-          <li>✓ Strobe with adjustable ON/OFF durations</li>
-          <li>✓ Live frequency display</li>
-          <li>✓ Strobe speed presets (Slow/Med/Fast)</li>
-          <li>✓ Sound-activated flashing</li>
-          <li>✓ Microphone selection</li>
-          <li>✓ Sound level meter with threshold marker</li>
-          <li>✓ Live audio spectrum visualizer</li>
-          <li>✓ Adjustable sound sensitivity</li>
-          <li>✓ Adjustable flash duration for sound mode</li>
-          <li>✓ SOS morse pattern</li>
-          <li>✓ Heartbeat pattern</li>
-          <li>✓ Police strobe (red/blue)</li>
-          <li>✓ Disco RGB pattern</li>
-          <li>✓ Candle flicker pattern</li>
-          <li>✓ Beacon slow pulse</li>
-          <li>✓ Rainbow cycle pattern</li>
-          <li>✓ Morse "OK" pattern</li>
-          <li>✓ ECG pattern</li>
-          <li>✓ Party strobe pattern</li>
-          <li>✓ Pattern speed multiplier</li>
-          <li>✓ Wake Lock (keep screen awake)</li>
-          <li>✓ Battery level display</li>
-          <li>✓ Auto-stop timer</li>
-          <li>✓ 3-second countdown</li>
-          <li>✓ Live statistics (flashes, runtime, Hz)</li>
-          <li>✓ Vibration feedback</li>
-          <li>✓ Dark / light theme</li>
-          <li>✓ Save/load presets (localStorage)</li>
-          <li>✓ Export/import settings</li>
-          <li>✓ Keyboard shortcuts</li>
-          <li>✓ Floating stop button</li>
-          <li>✓ Toast notifications</li>
-          <li>✓ Responsive mobile-first design</li>
-          <li>✓ PWA-ready meta tags</li>
-          <li>✓ No tracking, 100% offline capable</li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Browser Support</div>
-        <div class="hint">
-          <strong>Torch:</strong> Chrome/Edge on Android. iOS Safari doesn't support torch API.<br>
-          <strong>Microphone:</strong> All modern browsers (requires HTTPS or localhost).<br>
-          <strong>Wake Lock:</strong> Chrome/Edge/Safari 16.4+.<br>
-          <strong>Fullscreen:</strong> All modern browsers.
-        </div>
-      </div>
     </section>
+
   </main>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 (function(){
 'use strict';
 
-// ============================================
-// UTILITIES
-// ============================================
+// ===== UTILS =====
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 let toastTimer;
-function toast(msg, duration=2000) {
+function toast(msg, dur=2200) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+  toastTimer = setTimeout(() => t.classList.remove('show'), dur);
 }
 
-function vibrate(pattern) {
-  if (!S.settings.vibration) return;
-  if (navigator.vibrate) navigator.vibrate(pattern);
+function vibrate(p) {
+  if (!S.settings.vibrate) return;
+  if (navigator.vibrate) navigator.vibrate(p);
 }
 
-// ============================================
-// STATE
-// ============================================
+// ===== STATE =====
 const S = {
-  torch: { track: null, stream: null, available: false, on: false },
-  light: { on: false, color: '#ffffff', brightness: 100, activeMode: null },
-  strobe: { on: false, onMs: 80, offMs: 120, timers: [], count: 0, startTime: 0 },
-  sound: {
-    on: false, ctx: null, analyser: null, stream: null, raf: null,
-    threshold: 0.08, flashMs: 120, flashTimer: null, level: 0, testMode: false
+  words: [],           // ['halo', 'tolong']
+  audio: {
+    url: null,
+    name: '',
+    size: 0,
+    isObjectURL: false,
   },
-  pattern: { on: false, name: null, timers: [], step: 0, speed: 1 },
-  wake: null,
-  battery: null,
-  autoStopTimer: null,
-  stats: { blinks: 0, startTime: Date.now(), peakHz: 0 },
-  settings: { vibration: true, theme: 'dark', countdown: false },
+  settings: {
+    lang: 'id-ID',
+    matchMode: 'contains',
+    fuzzyTolerance: 1,
+    cooldown: 3,
+    audioOn: true,
+    pauseWhilePlay: true,
+    lightOn: true,
+    flashMode: 'screen',
+    flashDuration: 1500,
+    strobeSpeed: 5,
+    flashColor: '#ffffff',
+    vibrate: true,
+    ttsOn: false,
+    wakeLock: false,
+    continuous: true,
+    volume: 1,
+    repeat: 1,
+    theme: 'dark',
+  },
+  stats: {
+    triggers: 0,
+  },
+  history: [],         // [{word, transcript, time}]
+  runtime: {
+    recognition: null,
+    listening: false,
+    lastTriggerTime: 0,
+    audioPlaying: false,
+    flashTimers: [],
+    wakeLockObj: null,
+    torch: { track: null, stream: null, available: false },
+    audioEl: null,
+  },
 };
 
-// ============================================
-// LIGHT CONTROL
-// ============================================
-const overlay = $('#lightOverlay');
-const floatingBar = $('#floatingBar');
-
-function paintLight() {
-  overlay.style.background = S.light.color;
-  overlay.style.opacity = (S.light.brightness / 100).toString();
+// ===== PERSISTENCE =====
+const STORE_KEY = 'voicetrigger_v1';
+function saveState() {
+  try {
+    const toSave = {
+      words: S.words,
+      settings: S.settings,
+      stats: S.stats,
+      history: S.history.slice(0, 100),
+    };
+    localStorage.setItem(STORE_KEY, JSON.stringify(toSave));
+  } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (Array.isArray(d.words)) S.words = d.words;
+    if (d.settings) S.settings = { ...S.settings, ...d.settings };
+    if (d.stats) S.stats = { ...S.stats, ...d.stats };
+    if (Array.isArray(d.history)) S.history = d.history;
+  } catch(e) {}
 }
 
-function applyTorch(on) {
-  if (!S.torch.track || !S.torch.available) return Promise.resolve(false);
-  return S.torch.track.applyConstraints({ advanced: [{ torch: on }] })
-    .then(() => { S.torch.on = on; return true; })
-    .catch(() => false);
+// ===== SPEECH RECOGNITION =====
+function getSpeechRecognition() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
-async function setLight(on) {
-  if (on && !S.light.on) {
-    overlay.classList.add('active', 'on');
-    paintLight();
-    S.light.on = true;
-    applyTorch(true);
-    S.stats.blinks++;
-    updateStatsUI();
-  } else if (!on && S.light.on) {
-    overlay.classList.remove('on');
-    S.light.on = false;
-    applyTorch(false);
-    // hide overlay after transition
+function initRecognition() {
+  const SR = getSpeechRecognition();
+  if (!SR) {
+    showStatus('error', 'Browser tidak mendukung pengenalan suara');
+    return null;
+  }
+  if (S.runtime.recognition) {
+    try { S.runtime.recognition.stop(); } catch(e){}
+  }
+  const r = new SR();
+  r.lang = S.settings.lang;
+  r.continuous = true;
+  r.interimResults = true;
+  r.maxAlternatives = 3;
+
+  r.onstart = () => {
+    showStatus('listening');
+    updateListenUI(true);
+  };
+
+  r.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      const transcript = (res[0].transcript || '').toLowerCase().trim();
+      if (!res.isFinal) {
+        interim += ' ' + transcript;
+        showTranscript(transcript, false);
+      } else {
+        showTranscript(transcript, true);
+        if (!S.runtime.audioPlaying || !S.settings.pauseWhilePlay) {
+          checkTriggers(transcript, res);
+        }
+      }
+    }
+  };
+
+  r.onerror = (e) => {
+    const err = e.error;
+    if (err === 'no-speech' || err === 'aborted') return;
+    if (err === 'not-allowed' || err === 'service-not-allowed') {
+      showStatus('error', 'Izin mikrofon ditolak');
+      S.runtime.listening = false;
+      updateListenUI(false);
+    } else if (err === 'network') {
+      showStatus('error', 'Koneksi bermasalah');
+    } else {
+      showStatus('error', 'Error: ' + err);
+    }
+  };
+
+  r.onend = () => {
+    if (S.runtime.listening) {
+      // auto-restart
+      setTimeout(() => {
+        if (S.runtime.listening) {
+          try { r.start(); } catch(e){}
+        }
+      }, 300);
+    } else {
+      updateListenUI(false);
+      if (!S.runtime.listening) showStatus('idle');
+    }
+  };
+
+  return r;
+}
+
+function startListening() {
+  const SR = getSpeechRecognition();
+  if (!SR) {
+    toast('❌ Browser tidak mendukung. Pakai Chrome Android.');
+    return;
+  }
+  if (S.runtime.listening) return;
+  if (!S.words.length) {
+    toast('📝 Tambah kata pemicu dulu di tab Kata');
+    return;
+  }
+  S.runtime.recognition = initRecognition();
+  if (!S.runtime.recognition) return;
+  S.runtime.listening = true;
+  try {
+    S.runtime.recognition.start();
+    vibrate(30);
+    if (S.settings.wakeLock) requestWakeLock();
+  } catch(e) {
+    toast('❌ Gagal: ' + e.message);
+    S.runtime.listening = false;
+    updateListenUI(false);
+  }
+}
+
+function stopListening() {
+  S.runtime.listening = false;
+  if (S.runtime.recognition) {
+    try { S.runtime.recognition.stop(); } catch(e){}
+  }
+  releaseWakeLock();
+  showStatus('idle');
+  updateListenUI(false);
+}
+
+// ===== WORD MATCHING =====
+function checkTriggers(transcript, resultEvent) {
+  if (!transcript) return;
+  const now = Date.now();
+  if (now - S.runtime.lastTriggerTime < S.settings.cooldown * 1000) return;
+
+  for (const word of S.words) {
+    if (matches(transcript, word)) {
+      S.runtime.lastTriggerTime = now;
+      fireTrigger(word, transcript);
+      return;
+    }
+  }
+}
+
+function matches(text, word) {
+  const t = text.toLowerCase();
+  const w = word.toLowerCase();
+  const mode = S.settings.matchMode;
+  if (mode === 'exact') return t === w;
+  if (mode === 'contains') return t.includes(w) || w.includes(t);
+  if (mode === 'fuzzy') {
+    if (t.includes(w)) return true;
+    const tokens = t.split(/\s+/).filter(Boolean);
+    return tokens.some(tok => levenshtein(tok, w) <= S.settings.fuzzyTolerance);
+  }
+  return false;
+}
+
+function levenshtein(a, b) {
+  if (a.length < b.length) [a,b] = [b,a];
+  const m = a.length, n = b.length;
+  if (n === 0) return m;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      dp[j] = a[i-1] === b[j-1] ? prev : 1 + Math.min(dp[j], dp[j-1], prev);
+      prev = tmp;
+    }
+  }
+  return dp[n];
+}
+
+// ===== TRIGGER ACTIONS =====
+async function fireTrigger(word, transcript) {
+  // Update stats & history
+  S.stats.triggers++;
+  S.history.unshift({
+    word: word,
+    transcript: transcript,
+    time: Date.now(),
+  });
+  if (S.history.length > 200) S.history = S.history.slice(0, 200);
+  saveState();
+  updateStatsUI();
+  updateHistoryUI();
+  updateActiveWordsUI();
+
+  // Visual feedback
+  pulseFeedback();
+  vibrate([60, 40, 60, 40, 60]);
+
+  // Pause mic while audio plays
+  const shouldPauseMic = S.settings.audioOn && S.audio.url && S.settings.pauseWhilePlay;
+  if (shouldPauseMic && S.runtime.recognition) {
+    try { S.runtime.recognition.stop(); } catch(e){}
+  }
+
+  // Actions in parallel where possible
+  const tasks = [];
+
+  if (S.settings.audioOn && S.audio.url) {
+    tasks.push(playAudio());
+  }
+
+  if (S.settings.lightOn) {
+    tasks.push(doFlash());
+  }
+
+  if (S.settings.ttsOn) {
+    speakText(word);
+  }
+
+  await Promise.allSettled(tasks);
+
+  // Restart listening if needed
+  if (shouldPauseMic && S.runtime.listening) {
     setTimeout(() => {
-      if (!S.light.on) overlay.classList.remove('active');
-    }, 80);
+      if (S.runtime.listening && S.runtime.recognition) {
+        try { S.runtime.recognition.start(); } catch(e){}
+      }
+    }, 300);
   }
 }
 
-function showFloatingBar() { floatingBar.classList.add('visible'); }
-function hideFloatingBar() { floatingBar.classList.remove('visible'); }
+function pulseFeedback() {
+  const el = $('#pulseFeedback');
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 250);
+}
 
-async function enterLightMode(modeName) {
-  S.light.activeMode = modeName;
-  document.body.classList.add('light-mode');
-  showFloatingBar();
-  if (S.settings.countdown && ['strobe','sound','pattern','manual'].includes(modeName)) {
-    await runCountdown();
+// ===== AUDIO =====
+function getAudioEl() {
+  if (!S.runtime.audioEl) {
+    S.runtime.audioEl = new Audio();
+    S.runtime.audioEl.addEventListener('ended', () => {
+      S.runtime.audioPlaying = false;
+    });
+  }
+  return S.runtime.audioEl;
+}
+
+async function playAudio() {
+  if (!S.audio.url) return;
+  const el = getAudioEl();
+  el.src = S.audio.url;
+  el.volume = S.settings.volume;
+  el.currentTime = 0;
+  S.runtime.audioPlaying = true;
+  const repeat = Math.max(1, S.settings.repeat);
+  try {
+    for (let i = 0; i < repeat; i++) {
+      el.currentTime = 0;
+      await el.play().catch(err => console.warn('Play err:', err.message));
+      // wait for ended
+      await new Promise(resolve => {
+        const onEnd = () => { el.removeEventListener('ended', onEnd); resolve(); };
+        el.addEventListener('ended', onEnd);
+        setTimeout(() => { el.removeEventListener('ended', onEnd); resolve(); }, 30000);
+      });
+    }
+  } finally {
+    S.runtime.audioPlaying = false;
   }
 }
 
-function exitLightMode() {
-  stopAllModes();
-  document.body.classList.remove('light-mode');
-  hideFloatingBar();
-  S.light.activeMode = null;
-  setLight(false);
-  updateAllUI();
-}
-
-// Manual light toggle
-async function toggleManualLight() {
-  if (S.light.on) {
-    exitLightMode();
-  } else {
-    await enterLightMode('manual');
-    setLight(true);
-    vibrate(20);
+function setAudioFromFile(file) {
+  if (!file) return;
+  if (S.audio.isObjectURL && S.audio.url) {
+    URL.revokeObjectURL(S.audio.url);
   }
+  const url = URL.createObjectURL(file);
+  S.audio.url = url;
+  S.audio.name = file.name;
+  S.audio.size = file.size;
+  S.audio.isObjectURL = true;
+  saveState();
+  updateAudioUI();
+  toast('🎵 MP3 dimuat: ' + file.name);
 }
 
-// ============================================
-// COUNTDOWN
-// ============================================
-async function runCountdown() {
-  for (let n = 3; n > 0; n--) {
-    const el = document.createElement('div');
-    el.className = 'countdown-overlay';
-    el.textContent = n;
-    document.body.appendChild(el);
-    vibrate(50);
-    await sleep(1000);
-    el.remove();
+function setAudioFromUrl(url) {
+  if (!url) return;
+  if (S.audio.isObjectURL && S.audio.url) {
+    URL.revokeObjectURL(S.audio.url);
   }
+  S.audio.url = url;
+  S.audio.name = 'URL eksternal';
+  S.audio.size = 0;
+  S.audio.isObjectURL = false;
+  saveState();
+  updateAudioUI();
+  toast('🎵 URL dimuat');
 }
 
-// ============================================
-// TORCH
-// ============================================
+// ===== LIGHT / FLASH =====
 async function initTorch() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: 320, height: 240 }
+      video: { facingMode: 'environment' }
     });
     const track = stream.getVideoTracks()[0];
     const caps = track.getCapabilities ? track.getCapabilities() : {};
-    S.torch.stream = stream;
-    S.torch.track = track;
-    S.torch.available = !!caps.torch;
-    if (!S.torch.available) {
-      // keep track for potential screen light fallback
-      toast('⚠️ Torch not available — screen light works');
-    } else {
-      toast('🔦 Torch ready');
+    S.runtime.torch.stream = stream;
+    S.runtime.torch.track = track;
+    S.runtime.torch.available = !!caps.torch;
+    if (!S.runtime.torch.available) {
+      stream.getTracks().forEach(t => t.stop());
+      S.runtime.torch.stream = null;
+      S.runtime.torch.track = null;
     }
-  } catch (e) {
-    console.warn('Torch init:', e.message);
-    toast('💡 Screen light mode only');
-  }
-  updateTorchButton();
-}
-
-function updateTorchButton() {
-  const btn = $('#btnTorch');
-  btn.textContent = S.torch.available ? '🔦 Torch Ready' : '🔦 Screen Only';
-}
-
-// ============================================
-// STROBE
-// ============================================
-async function startStrobe() {
-  stopAllModes();
-  await enterLightMode('strobe');
-  S.strobe.on = true;
-  S.strobe.startTime = Date.now();
-  S.strobe.count = 0;
-  vibrate([10, 30, 10]);
-  
-  const cycle = async () => {
-    if (!S.strobe.on) return;
-    await setLight(true);
-    S.strobe.count++;
-    const t1 = setTimeout(async () => {
-      if (!S.strobe.on) return;
-      await setLight(false);
-      const t2 = setTimeout(cycle, S.strobe.offMs);
-      S.strobe.timers.push(t2);
-    }, S.strobe.onMs);
-    S.strobe.timers.push(t1);
-  };
-  cycle();
-  
-  updateStrobeFreq();
-  updateStrobeButton();
-}
-
-function stopStrobe() {
-  S.strobe.on = false;
-  S.strobe.timers.forEach(t => clearTimeout(t));
-  S.strobe.timers = [];
-  updateStrobeButton();
-}
-
-function updateStrobeFreq() {
-  const freq = 1000 / (S.strobe.onMs + S.strobe.offMs);
-  $('#freqVal').textContent = freq.toFixed(1) + ' Hz';
-  if (freq > S.stats.peakHz) {
-    S.stats.peakHz = freq;
-    updateStatsUI();
+  } catch(e) {
+    S.runtime.torch.available = false;
   }
 }
 
-function updateStrobeButton() {
-  const btn = $('#btnStartStrobe');
-  if (S.strobe.on) {
-    btn.textContent = '⏹ STOP STROBE';
-    btn.classList.remove('btn-primary');
-    btn.classList.add('btn-danger');
-  } else {
-    btn.textContent = '💥 START STROBE';
-    btn.classList.remove('btn-danger');
-    btn.classList.add('btn-primary');
-  }
-}
-
-// ============================================
-// SOUND
-// ============================================
-async function enableMic() {
-  if (S.sound.ctx) return true;
+async function setTorch(on) {
+  if (!S.runtime.torch.track || !S.runtime.torch.available) return false;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') await ctx.resume();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.6;
-    const source = ctx.createMediaStreamSource(stream);
-    source.connect(analyser);
-    
-    S.sound.stream = stream;
-    S.sound.ctx = ctx;
-    S.sound.analyser = analyser;
-    S.sound.testMode = true;
-    startSoundLoop();
-    populateMicList();
-    toast('🎤 Mic active');
+    await S.runtime.torch.track.applyConstraints({ advanced: [{ torch: on }] });
     return true;
-  } catch (e) {
-    toast('❌ Mic denied: ' + e.message);
-    return false;
-  }
+  } catch(e) { return false; }
 }
 
-function startSoundLoop() {
-  if (!S.sound.analyser) return;
-  const dataArray = new Uint8Array(S.sound.analyser.fftSize);
-  const freqArray = new Uint8Array(S.sound.analyser.frequencyBinCount);
-  const meter = $('#meterFill');
-  const canvas = $('#spectrum');
-  const canvasCtx = canvas.getContext('2d');
-  
-  // resize canvas
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = canvas.clientWidth * dpr;
-  canvas.height = canvas.clientHeight * dpr;
-  canvasCtx.scale(dpr, dpr);
-  
-  const loop = () => {
-    if (!S.sound.analyser) return;
-    S.sound.analyser.getByteTimeDomainData(dataArray);
-    S.sound.analyser.getByteFrequencyData(freqArray);
-    
-    // RMS
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-      const v = (dataArray[i] - 128) / 128;
-      sum += v * v;
-    }
-    const rms = Math.min(1, Math.sqrt(sum / dataArray.length) * 2.5);
-    S.sound.level = rms;
-    meter.style.width = (rms * 100) + '%';
-    
-    // spectrum
-    const w = canvas.clientWidth, h = canvas.clientHeight;
-    canvasCtx.clearRect(0, 0, w, h);
-    const bars = 32;
-    const step = Math.floor(freqArray.length / bars);
-    const bw = w / bars;
-    for (let i = 0; i < bars; i++) {
-      let v = 0;
-      for (let j = 0; j < step; j++) v = Math.max(v, freqArray[i*step+j]);
-      const bh = (v / 255) * h;
-      const hue = 45 - (i / bars) * 45; // amber to red
-      canvasCtx.fillStyle = `hsl(${40 - i}, 100%, 55%)`;
-      canvasCtx.fillRect(i * bw + 1, h - bh, bw - 2, bh);
-    }
-    
-    // Sound trigger
-    if (S.sound.on && rms > S.sound.threshold) {
-      triggerSoundFlash();
-    }
-    
-    S.sound.raf = requestAnimationFrame(loop);
-  };
-  loop();
-  
-  // populate mic devices
-  navigator.mediaDevices.enumerateDevices().then(devices => {
-    const sel = $('#micSelect');
-    const current = sel.value;
-    sel.innerHTML = '<option value="">Default Microphone</option>';
-    devices.filter(d => d.kind === 'audioinput').forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.deviceId;
-      o.textContent = d.label || 'Microphone ' + (sel.options.length);
-      sel.appendChild(o);
-    });
-    sel.value = current;
-  }).catch(() => {});
+function setScreenLight(on, color) {
+  const el = $('#lightOverlay');
+  el.style.background = color || S.settings.flashColor;
+  el.style.opacity = on ? '1' : '0';
 }
 
-function populateMicList() { /* called from startSoundLoop */ }
+async function doFlash() {
+  const mode = S.settings.flashMode;
+  const dur = S.settings.flashDuration;
+  const color = S.settings.flashColor;
 
-function triggerSoundFlash() {
-  if (S.sound.flashTimer) {
-    clearTimeout(S.sound.flashTimer);
-  } else {
-    setLight(true);
-  }
-  S.sound.flashTimer = setTimeout(() => {
-    setLight(false);
-    S.sound.flashTimer = null;
-  }, S.sound.flashMs);
-}
+  clearFlashTimers();
 
-async function startSoundMode() {
-  stopAllModes();
-  const ok = await enableMic();
-  if (!ok) return;
-  await enterLightMode('sound');
-  S.sound.on = true;
-  vibrate([10, 20, 10]);
-  $('#btnStartSound').textContent = '⏹ STOP SOUND MODE';
-  $('#btnStartSound').classList.remove('btn-primary');
-  $('#btnStartSound').classList.add('btn-danger');
-}
-
-function stopSoundMode() {
-  S.sound.on = false;
-  if (S.sound.flashTimer) {
-    clearTimeout(S.sound.flashTimer);
-    S.sound.flashTimer = null;
-  }
-  $('#btnStartSound').textContent = '🔊 ACTIVATE SOUND LIGHT';
-  $('#btnStartSound').classList.add('btn-primary');
-  $('#btnStartSound').classList.remove('btn-danger');
-}
-
-// ============================================
-// PATTERNS
-// ============================================
-const PATTERNS = {
-  sos: {
-    emoji: '🆘', name: 'SOS',
-    steps: [
-      {on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:350},
-      {on:1,d:450},{on:0,d:150},{on:1,d:450},{on:0,d:150},{on:1,d:450},{on:0,d:350},
-      {on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:1200}
-    ]
-  },
-  heartbeat: {
-    emoji: '❤️', name: 'Heartbeat',
-    steps: [
-      {on:1,d:100},{on:0,d:80},{on:1,d:140},{on:0,d:700}
-    ]
-  },
-  police: {
-    emoji: '🚨', name: 'Police',
-    steps: [
-      {on:1,d:100,c:'#ff0000'},{on:0,d:60},
-      {on:1,d:100,c:'#ff0000'},{on:0,d:60},
-      {on:1,d:100,c:'#0000ff'},{on:0,d:60},
-      {on:1,d:100,c:'#0000ff'},{on:0,d:60},
-      {on:0,d:200}
-    ]
-  },
-  disco: {
-    emoji: '🕺', name: 'Disco',
-    steps: [
-      {on:1,d:80,c:'#ff0000'},{on:0,d:30},
-      {on:1,d:80,c:'#00ff00'},{on:0,d:30},
-      {on:1,d:80,c:'#0000ff'},{on:0,d:30},
-      {on:1,d:80,c:'#ffff00'},{on:0,d:30},
-      {on:1,d:80,c:'#ff00ff'},{on:0,d:30},
-      {on:1,d:80,c:'#00ffff'},{on:0,d:30},
-    ]
-  },
-  candle: {
-    emoji: '🕯️', name: 'Candle',
-    steps: [
-      {on:1,d:100,b:1.0},{on:1,d:80,b:0.7},
-      {on:1,d:120,b:0.9},{on:1,d:60,b:0.5},
-      {on:1,d:150,b:0.8},{on:0,d:40},
-      {on:1,d:90,b:0.6},{on:1,d:100,b:0.9}
-    ]
-  },
-  beacon: {
-    emoji: '🗼', name: 'Beacon',
-    steps: [
-      {on:1,d:150},{on:0,d:1200}
-    ]
-  },
-  rainbow: {
-    emoji: '🌈', name: 'Rainbow',
-    steps: [
-      {on:1,d:200,c:'#ff0000'},{on:1,d:200,c:'#ff8800'},
-      {on:1,d:200,c:'#ffff00'},{on:1,d:200,c:'#00ff00'},
-      {on:1,d:200,c:'#00ffff'},{on:1,d:200,c:'#0000ff'},
-      {on:1,d:200,c:'#8800ff'},{on:1,d:200,c:'#ff00ff'},
-    ]
-  },
-  morseOK: {
-    emoji: '✅', name: 'Morse OK',
-    steps: [
-      // O = ---
-      {on:1,d:400},{on:0,d:150},{on:1,d:400},{on:0,d:150},{on:1,d:400},{on:0,d:350},
-      // K = -.-
-      {on:1,d:400},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:400},{on:0,d:1000}
-    ]
-  },
-  ecg: {
-    emoji: '💓', name: 'ECG',
-    steps: [
-      {on:1,d:40},{on:0,d:40},{on:1,d:20},{on:0,d:20},
-      {on:1,d:60},{on:0,d:40},{on:1,d:120},{on:0,d:100},
-      {on:1,d:30},{on:0,d:30},{on:1,d:30},{on:0,d:800}
-    ]
-  },
-  party: {
-    emoji: '🎉', name: 'Party',
-    steps: [
-      {on:1,d:50},{on:0,d:50},{on:1,d:50},{on:0,d:50},
-      {on:1,d:30},{on:0,d:30},{on:1,d:30},{on:0,d:400}
-    ]
-  }
-};
-
-async function startPattern(name) {
-  stopAllModes();
-  const p = PATTERNS[name];
-  if (!p) return;
-  await enterLightMode('pattern');
-  S.pattern.on = true;
-  S.pattern.name = name;
-  S.pattern.step = 0;
-  vibrate([10, 30, 10]);
-  updatePatternUI();
-  
-  const step = async () => {
-    if (!S.pattern.on) return;
-    const st = p.steps[S.pattern.step % p.steps.length];
-    S.pattern.step++;
-    const speed = 100 / S.pattern.speed; // 100/speed
-    
-    if (st.c) S.light.color = st.c;
-    if (st.b !== undefined) {
-      // brightness override (for candle)
-      overlay.style.background = S.light.color;
-      overlay.style.opacity = (st.b * S.light.brightness / 100);
-      overlay.classList.add('active','on');
-      S.light.on = true;
-    } else if (st.on) {
-      await setLight(true);
+  if (mode === 'torch') {
+    if (S.runtime.torch.available) {
+      await setTorch(true);
+      const t = setTimeout(() => setTorch(false), dur);
+      S.runtime.flashTimers.push(t);
     } else {
-      await setLight(false);
+      // fallback to screen
+      setScreenLight(true, color);
+      const t = setTimeout(() => setScreenLight(false), dur);
+      S.runtime.flashTimers.push(t);
     }
-    
-    const t = setTimeout(step, st.d * speed);
-    S.pattern.timers.push(t);
-  };
-  step();
-}
-
-function stopPattern() {
-  S.pattern.on = false;
-  S.pattern.name = null;
-  S.pattern.timers.forEach(t => clearTimeout(t));
-  S.pattern.timers = [];
-  updatePatternUI();
-}
-
-function updatePatternUI() {
-  $$('.pattern-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.pattern === S.pattern.name);
-  });
-}
-
-// ============================================
-// MODE MANAGER
-// ============================================
-function stopAllModes() {
-  stopStrobe();
-  stopSoundMode();
-  stopPattern();
-  clearTimeout(S.autoStopTimer);
-  if (S.sound.flashTimer) {
-    clearTimeout(S.sound.flashTimer);
-    S.sound.flashTimer = null;
+  } else if (mode === 'screen') {
+    setScreenLight(true, color);
+    const t = setTimeout(() => setScreenLight(false), dur);
+    S.runtime.flashTimers.push(t);
+  } else if (mode === 'both') {
+    setTorch(true);
+    setScreenLight(true, color);
+    const t = setTimeout(() => {
+      setTorch(false);
+      setScreenLight(false);
+    }, dur);
+    S.runtime.flashTimers.push(t);
+  } else if (mode === 'strobe') {
+    const strobeSpeed = S.settings.strobeSpeed;
+    const interval = 200 - (strobeSpeed * 15); // 5 = 125ms
+    const endTime = Date.now() + dur;
+    const doStrobeStep = () => {
+      if (Date.now() >= endTime) {
+        setScreenLight(false);
+        setTorch(false);
+        return;
+      }
+      setScreenLight(true, color);
+      setTorch(true);
+      const t1 = setTimeout(() => {
+        setScreenLight(false);
+        setTorch(false);
+        const t2 = setTimeout(doStrobeStep, interval);
+        S.runtime.flashTimers.push(t2);
+      }, interval);
+      S.runtime.flashTimers.push(t1);
+    };
+    doStrobeStep();
   }
 }
 
-// ============================================
-// WAKE LOCK
-// ============================================
-async function toggleWakeLock() {
-  if (S.wake) {
-    await S.wake.release();
-    S.wake = null;
-    $('#chipWake').textContent = '💤';
-    $('#chipWake').classList.remove('active');
-    $('#swWake').classList.remove('on');
-    return;
-  }
+function clearFlashTimers() {
+  S.runtime.flashTimers.forEach(t => clearTimeout(t));
+  S.runtime.flashTimers = [];
+  setScreenLight(false);
+  setTorch(false);
+}
+
+// ===== TTS =====
+function speakText(text) {
+  if (!('speechSynthesis' in window)) return;
   try {
-    S.wake = await navigator.wakeLock.request('screen');
-    $('#chipWake').textContent = '⚡';
-    $('#chipWake').classList.add('active');
-    $('#swWake').classList.add('on');
-    S.wake.addEventListener('release', () => {
-      S.wake = null;
-      $('#chipWake').textContent = '💤';
-      $('#chipWake').classList.remove('active');
-      $('#swWake').classList.remove('on');
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = S.settings.lang;
+    u.rate = 1;
+    u.volume = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+// ===== WAKE LOCK =====
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    S.runtime.wakeLockObj = await navigator.wakeLock.request('screen');
+    S.runtime.wakeLockObj.addEventListener('release', () => {
+      S.runtime.wakeLockObj = null;
     });
-    toast('🔒 Screen will stay awake');
-  } catch (e) {
-    toast('❌ Wake Lock: ' + e.message);
+  } catch(e) {}
+}
+
+function releaseWakeLock() {
+  if (S.runtime.wakeLockObj) {
+    try { S.runtime.wakeLockObj.release(); } catch(e){}
+    S.runtime.wakeLockObj = null;
   }
 }
 
-// ============================================
-// BATTERY
-// ============================================
+// ===== BATTERY =====
 async function initBattery() {
-  if (!('getBattery' in navigator)) {
-    $('#chipBattery').textContent = '🔋 N/A';
-    return;
-  }
+  if (!('getBattery' in navigator)) return;
   try {
     const b = await navigator.getBattery();
-    S.battery = b;
     const update = () => {
       const lvl = Math.round(b.level * 100);
       const icon = b.charging ? '⚡' : (lvl < 20 ? '🪫' : '🔋');
-      $('#chipBattery').textContent = `${icon} ${lvl}%`;
-      $('#statBattery').textContent = lvl + '%';
+      $('#chipBattery').textContent = icon + ' ' + lvl + '%';
       $('#chipBattery').classList.toggle('active', b.charging);
     };
     update();
     b.addEventListener('levelchange', update);
     b.addEventListener('chargingchange', update);
-  } catch (e) {
-    $('#chipBattery').textContent = '🔋 --';
+  } catch(e) {}
+}
+
+// ===== STATUS / UI UPDATES =====
+function showStatus(mode, msg) {
+  const dot = $('#statusDot');
+  const txt = $('#statusText');
+  dot.className = 'status-dot';
+  if (mode === 'listening') {
+    dot.classList.add('green');
+    txt.textContent = 'Mendengar aktif — ucapkan kata pemicu';
+  } else if (mode === 'error') {
+    dot.classList.add('red');
+    txt.textContent = msg || 'Error';
+  } else if (mode === 'processing') {
+    dot.classList.add('yellow');
+    txt.textContent = msg || 'Memproses…';
+  } else {
+    txt.textContent = msg || 'Belum aktif';
   }
 }
 
-// ============================================
-// FULLSCREEN
-// ============================================
-async function toggleFullscreen() {
-  try {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-      $('#btnFullscreen').classList.add('active');
-      toast('⛶ Fullscreen ON');
-    } else {
-      await document.exitFullscreen();
-      $('#btnFullscreen').classList.remove('active');
+function updateListenUI(isListening) {
+  const btn = $('#listenBtn');
+  const label = $('#listenLabel');
+  const sub = $('#listenSub');
+  if (isListening) {
+    btn.classList.add('listening');
+    label.textContent = 'Sedang Mendengar…';
+    sub.textContent = 'Tekan lagi untuk berhenti';
+  } else {
+    btn.classList.remove('listening');
+    label.textContent = 'Tekan untuk Mulai';
+    sub.textContent = 'Aplikasi akan mendengar kata pemicu';
+  }
+}
+
+function showTranscript(text, isFinal) {
+  const el = $('#transcriptText');
+  if (isFinal) {
+    // highlight matched
+    let html = escapeHtml(text);
+    for (const w of S.words) {
+      const re = new RegExp(escapeRegex(w), 'gi');
+      html = html.replace(re, '<span class="matched">$&</span>');
     }
-  } catch (e) {
-    toast('❌ ' + e.message);
+    el.innerHTML = html || '—';
+  } else {
+    el.innerHTML = '<span class="interim">' + escapeHtml(text) + '…</span>';
   }
 }
 
-// ============================================
-// THEME
-// ============================================
-function toggleTheme() {
-  const cur = document.body.dataset.theme;
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.body.dataset.theme = next;
-  $('#btnTheme').textContent = next === 'dark' ? '🌙' : '☀️';
-  S.settings.theme = next;
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// ============================================
-// STATS
-// ============================================
+function updateActiveWordsUI() {
+  const box = $('#activeWordsList');
+  if (!S.words.length) {
+    box.innerHTML = '<div class="empty">Belum ada kata. Tambahkan di tab "Kata".</div>';
+  } else {
+    box.innerHTML = S.words.map(w =>
+      `<span class="quick-chip" style="margin:2px 4px 2px 0">${escapeHtml(w)}</span>`
+    ).join('');
+  }
+  $('#statWords').textContent = S.words.length;
+}
+
 function updateStatsUI() {
-  $('#statBlinks').textContent = S.stats.blinks;
-  const secs = Math.floor((Date.now() - S.stats.startTime) / 1000);
-  $('#statRuntime').textContent = secs < 60 ? secs + 's' : Math.floor(secs/60) + 'm' + (secs%60) + 's';
-  $('#statFreq').textContent = S.stats.peakHz.toFixed(1);
+  $('#statTriggers').textContent = S.stats.triggers;
+  $('#statWords').textContent = S.words.length;
+  $('#wordCount').textContent = S.words.length;
+  $('#hTotal').textContent = S.stats.triggers;
+  const today = new Date().toDateString();
+  $('#hToday').textContent = S.history.filter(h => new Date(h.time).toDateString() === today).length;
 }
 
-setInterval(updateStatsUI, 1000);
-
-// ============================================
-// AUTO STOP
-// ============================================
-function setAutoStop(seconds) {
-  clearTimeout(S.autoStopTimer);
-  if (seconds <= 0) return;
-  S.autoStopTimer = setTimeout(() => {
-    exitLightMode();
-    toast('⏱️ Auto-stop triggered');
-  }, seconds * 1000);
+function updateWordsList() {
+  const box = $('#wordsList');
+  if (!S.words.length) {
+    box.innerHTML = '<div class="empty">Belum ada kata pemicu.</div>';
+    return;
+  }
+  box.innerHTML = S.words.map((w, i) => `
+    <div class="list-item">
+      <div class="main">
+        <div class="title">${escapeHtml(w)}</div>
+        <div class="sub">Kata pemicu #${i+1}</div>
+      </div>
+      <div class="actions">
+        <button class="mini-btn danger" data-del-word="${i}">🗑</button>
+      </div>
+    </div>
+  `).join('');
+  box.querySelectorAll('[data-del-word]').forEach(b => {
+    b.onclick = () => {
+      const i = +b.dataset.delWord;
+      S.words.splice(i, 1);
+      saveState();
+      updateWordsList();
+      updateActiveWordsUI();
+      updateStatsUI();
+    };
+  });
 }
 
-// ============================================
-// PRESETS
-// ============================================
-function savePreset() {
-  const p = {
-    color: S.light.color,
-    brightness: S.light.brightness,
-    strobeOn: S.strobe.onMs,
-    strobeOff: S.strobe.offMs,
-    threshold: S.sound.threshold,
-    flashMs: S.sound.flashMs,
-    patternSpeed: S.pattern.speed,
-    settings: S.settings,
-  };
-  localStorage.setItem('flashmaster_preset', JSON.stringify(p));
-  toast('💾 Preset saved');
+function updateHistoryUI() {
+  const box = $('#historyList');
+  if (!S.history.length) {
+    box.innerHTML = '<div class="empty">Belum ada riwayat. Coba pemicu dulu.</div>';
+    return;
+  }
+  box.innerHTML = S.history.slice(0, 30).map(h => {
+    const d = new Date(h.time);
+    const time = d.toLocaleString('id-ID', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short' });
+    return `
+      <div class="history-item">
+        <div class="icon">✓</div>
+        <div class="main">
+          <div class="word">${escapeHtml(h.word)}</div>
+          <div class="transcript">"${escapeHtml(h.transcript)}"</div>
+        </div>
+        <div class="time">${time}</div>
+      </div>
+    `;
+  }).join('');
 }
 
-function loadPreset() {
-  const raw = localStorage.getItem('flashmaster_preset');
-  if (!raw) return toast('❌ No saved preset');
-  try {
-    const p = JSON.parse(raw);
-    if (p.color) { S.light.color = p.color; $('#colorPicker').value = p.color; }
-    if (p.brightness) { S.light.brightness = p.brightness; $('#brightness').value = p.brightness; $('#brightnessVal').textContent = p.brightness + '%'; }
-    if (p.strobeOn) { S.strobe.onMs = p.strobeOn; $('#onMs').value = p.strobeOn; $('#onMsVal').textContent = p.strobeOn + ' ms'; }
-    if (p.strobeOff) { S.strobe.offMs = p.strobeOff; $('#offMs').value = p.strobeOff; $('#offMsVal').textContent = p.strobeOff + ' ms'; }
-    if (p.threshold) { S.sound.threshold = p.threshold; $('#threshold').value = p.threshold * 100; $('#thresholdVal').textContent = Math.round(p.threshold*100) + '%'; $('#meterThresh').style.left = (p.threshold * 100) + '%'; }
-    if (p.flashMs) { S.sound.flashMs = p.flashMs; $('#flashMs').value = p.flashMs; $('#flashMsVal').textContent = p.flashMs + ' ms'; }
-    if (p.patternSpeed) { S.pattern.speed = p.patternSpeed; $('#patternSpeed').value = p.patternSpeed * 100; $('#speedVal').textContent = p.patternSpeed.toFixed(1) + 'x'; }
-    if (p.settings) S.settings = { ...S.settings, ...p.settings };
-    updateStrobeFreq();
-    toast('📂 Preset loaded');
-  } catch(e) { toast('❌ Failed to load'); }
+function updateAudioUI() {
+  const info = $('#audioInfo');
+  if (S.audio.url) {
+    info.classList.remove('hidden');
+    $('#audioName').textContent = S.audio.name;
+    $('#audioSize').textContent = S.audio.size ? formatBytes(S.audio.size) : 'URL audio';
+  } else {
+    info.classList.add('hidden');
+  }
 }
 
-function exportSettings() {
-  const p = {
-    color: S.light.color, brightness: S.light.brightness,
-    strobeOn: S.strobe.onMs, strobeOff: S.strobe.offMs,
-    threshold: S.sound.threshold, flashMs: S.sound.flashMs,
-    patternSpeed: S.pattern.speed, settings: S.settings,
-  };
-  const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'flashmaster-config.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('📤 Exported');
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(1) + ' MB';
 }
 
-function importSettings() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json,application/json';
-  input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const p = JSON.parse(text);
-      localStorage.setItem('flashmaster_preset', JSON.stringify(p));
-      loadPreset();
-    } catch(e) { toast('❌ Invalid file'); }
-  };
-  input.click();
-}
-
-// ============================================
-// UI BINDINGS
-// ============================================
-function bindUI() {
-  // Tabs
+// ===== TABS =====
+function bindTabs() {
   $$('.tab').forEach(t => {
     t.onclick = () => {
       $$('.tab').forEach(x => x.classList.remove('active'));
@@ -1287,291 +1318,371 @@ function bindUI() {
       $('#tab-' + t.dataset.tab).classList.add('active');
     };
   });
-  
-  // Fullscreen
-  $('#btnFullscreen').onclick = toggleFullscreen;
-  document.addEventListener('fullscreenchange', () => {
-    $('#btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
-  });
-  
-  // Theme
-  $('#btnTheme').onclick = toggleTheme;
-  
-  // Power button
-  $('#powerBtn').onclick = toggleManualLight;
-  $('#btnScreen').onclick = toggleManualLight;
-  $('#btnTorch').onclick = async () => {
-    if (S.torch.available) {
-      const on = !S.torch.on;
-      await applyTorch(on);
-      toast(on ? '🔦 Torch ON' : '🔦 Torch OFF');
-      vibrate(15);
+}
+
+// ===== BIND ALL =====
+function bindUI() {
+  bindTabs();
+
+  // ---- LISTEN ----
+  $('#listenBtn').onclick = () => {
+    if (S.runtime.listening) {
+      stopListening();
     } else {
-      toast('🔦 Torch not supported — using screen');
-      toggleManualLight();
+      startListening();
     }
   };
-  
-  // Color
-  $('#colorPicker').oninput = e => {
-    S.light.color = e.target.value;
-    if (S.light.on) paintLight();
+  $('#btnTestTrigger').onclick = () => {
+    if (!S.words.length) return toast('📝 Tambah kata dulu');
+    const w = S.words[0];
+    fireTrigger(w, w + ' (tes)');
+    toast('🧪 Tes: ' + w);
   };
-  
-  // Color presets
-  const colors = ['#ffffff','#ff0000','#ff8800','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#ff69b4','#8b00ff'];
-  const cp = $('#colorPresets');
-  colors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'color-preset';
-    btn.style.background = c;
-    btn.onclick = () => {
-      S.light.color = c;
-      $('#colorPicker').value = c;
-      if (S.light.on) paintLight();
-    };
-    cp.appendChild(btn);
+  $('#btnStopAll').onclick = () => {
+    stopListening();
+    clearFlashTimers();
+    if (S.runtime.audioEl) {
+      try { S.runtime.audioEl.pause(); } catch(e){}
+    }
+    toast('⏹ Semua dihentikan');
+  };
+
+  // ---- WORDS ----
+  $('#btnAddWord').onclick = addWord;
+  $('#wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addWord(); }
   });
-  
-  // Quick presets
-  $$('[data-quick]').forEach(b => {
+  $$('[data-quick-word]').forEach(b => {
     b.onclick = () => {
-      S.light.color = b.dataset.quick;
-      $('#colorPicker').value = b.dataset.quick;
-      if (S.light.on) paintLight();
-      toast('🎨 Color applied');
-    };
-  });
-  
-  // Brightness
-  $('#brightness').oninput = e => {
-    S.light.brightness = +e.target.value;
-    $('#brightnessVal').textContent = e.target.value + '%';
-    if (S.light.on) paintLight();
-  };
-  
-  // Strobe
-  $('#onMs').oninput = e => {
-    S.strobe.onMs = +e.target.value;
-    $('#onMsVal').textContent = e.target.value + ' ms';
-    updateStrobeFreq();
-  };
-  $('#offMs').oninput = e => {
-    S.strobe.offMs = +e.target.value;
-    $('#offMsVal').textContent = e.target.value + ' ms';
-    updateStrobeFreq();
-  };
-  $$('[data-strobe]').forEach(b => {
-    b.onclick = () => {
-      const [on, off] = b.dataset.strobe.split(',').map(Number);
-      S.strobe.onMs = on;
-      S.strobe.offMs = off;
-      $('#onMs').value = on;
-      $('#offMs').value = off;
-      $('#onMsVal').textContent = on + ' ms';
-      $('#offMsVal').textContent = off + ' ms';
-      updateStrobeFreq();
-    };
-  });
-  $('#btnStartStrobe').onclick = () => {
-    if (S.strobe.on) {
-      stopStrobe();
-      exitLightMode();
-    } else {
-      startStrobe();
-    }
-  };
-  
-  // Sound
-  $('#btnTestMic').onclick = async () => {
-    if (S.sound.ctx) {
-      toast('🎤 Mic already active');
-    } else {
-      await enableMic();
-    }
-  };
-  $('#threshold').oninput = e => {
-    S.sound.threshold = +e.target.value / 100;
-    $('#thresholdVal').textContent = e.target.value + '%';
-    $('#meterThresh').style.left = e.target.value + '%';
-  };
-  $('#flashMs').oninput = e => {
-    S.sound.flashMs = +e.target.value;
-    $('#flashMsVal').textContent = e.target.value + ' ms';
-  };
-  $('#btnStartSound').onclick = () => {
-    if (S.sound.on) {
-      stopSoundMode();
-      exitLightMode();
-    } else {
-      startSoundMode();
-    }
-  };
-  $('#micSelect').onchange = async e => {
-    if (!e.target.value) return;
-    // restart with new device
-    if (S.sound.stream) {
-      S.sound.stream.getTracks().forEach(t => t.stop());
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: { exact: e.target.value } }
-      });
-      const src = S.sound.ctx.createMediaStreamSource(stream);
-      const analyser = S.sound.ctx.createAnalyser();
-      analyser.fftSize = 512;
-      analyser.smoothingTimeConstant = 0.6;
-      src.connect(analyser);
-      S.sound.stream = stream;
-      S.sound.analyser = analyser;
-      toast('🎤 Mic switched');
-    } catch(err) { toast('❌ ' + err.message); }
-  };
-  
-  // Pattern grid
-  const grid = $('#patternGrid');
-  Object.entries(PATTERNS).forEach(([key, p]) => {
-    const btn = document.createElement('button');
-    btn.className = 'pattern-btn';
-    btn.dataset.pattern = key;
-    btn.innerHTML = `<span class="emoji">${p.emoji}</span><span>${p.name}</span>`;
-    btn.onclick = () => {
-      if (S.pattern.on && S.pattern.name === key) {
-        stopPattern();
-        exitLightMode();
+      const w = b.dataset.quickWord.toLowerCase().trim();
+      if (!S.words.includes(w)) {
+        S.words.push(w);
+        saveState();
+        updateWordsList();
+        updateActiveWordsUI();
+        updateStatsUI();
+        toast('✓ Ditambah: ' + w);
       } else {
-        startPattern(key);
+        toast('Kata sudah ada');
       }
     };
-    grid.appendChild(btn);
   });
-  
-  // Pattern speed
-  $('#patternSpeed').oninput = e => {
-    S.pattern.speed = +e.target.value / 100;
-    $('#speedVal').textContent = S.pattern.speed.toFixed(1) + 'x';
+  $('#matchMode').onchange = e => {
+    S.settings.matchMode = e.target.value;
+    $('#fuzzyGroup').style.display = e.target.value === 'fuzzy' ? '' : 'none';
+    saveState();
   };
-  
-  // Tools
-  $('#swWake').onclick = toggleWakeLock;
-  $('#swVibrate').onclick = e => {
-    e.currentTarget.classList.toggle('on');
-    S.settings.vibration = e.currentTarget.classList.contains('on');
+  $('#fuzzyTolerance').oninput = e => {
+    S.settings.fuzzyTolerance = +e.target.value;
+    $('#fuzzyVal').textContent = e.target.value;
+    saveState();
   };
-  $('#swCountdown').onclick = e => {
-    e.currentTarget.classList.toggle('on');
-    S.settings.countdown = e.currentTarget.classList.contains('on');
+
+  function addWord() {
+    const v = $('#wordInput').value.toLowerCase().trim();
+    if (!v) return toast('Kata kosong');
+    if (S.words.includes(v)) return toast('Kata sudah ada');
+    S.words.push(v);
+    $('#wordInput').value = '';
+    saveState();
+    updateWordsList();
+    updateActiveWordsUI();
+    updateStatsUI();
+    toast('✓ Ditambah: ' + v);
+  }
+
+  // ---- AUDIO ----
+  $('#audioFile').onchange = e => {
+    const f = e.target.files[0];
+    if (f) setAudioFromFile(f);
   };
-  $('#autoStop').oninput = e => {
-    const v = +e.target.value;
-    $('#autoStopVal').textContent = v === 0 ? 'Off' : v + 's';
-    if (S.light.activeMode) setAutoStop(v);
+  $('#btnLoadUrl').onclick = () => {
+    const url = $('#audioUrl').value.trim();
+    if (!url) return toast('URL kosong');
+    setAudioFromUrl(url);
   };
-  $('#btnSavePreset').onclick = savePreset;
-  $('#btnLoadPreset').onclick = loadPreset;
-  $('#btnExport').onclick = exportSettings;
-  $('#btnImport').onclick = importSettings;
-  
-  // Floating stop
-  $('#btnStopLight').onclick = exitLightMode;
-  
-  // Keyboard
-  document.addEventListener('keydown', e => {
-    if (e.target.matches('input, select, textarea')) return;
-    switch(e.key.toLowerCase()) {
-      case ' ':
-        e.preventDefault();
-        toggleManualLight();
-        break;
-      case 'f': toggleFullscreen(); break;
-      case 's':
-        if (S.strobe.on) { stopStrobe(); exitLightMode(); }
-        else startStrobe();
-        break;
-      case 'escape': exitLightMode(); break;
-      case 't': toggleTheme(); break;
-      case '1': $$('.tab')[0].click(); break;
-      case '2': $$('.tab')[1].click(); break;
-      case '3': $$('.tab')[2].click(); break;
-      case '4': $$('.tab')[3].click(); break;
-      case '5': $$('.tab')[4].click(); break;
-      case '6': $$('.tab')[5].click(); break;
+  $('#btnPreviewAudio').onclick = () => {
+    if (!S.audio.url) return toast('Belum ada audio');
+    const el = getAudioEl();
+    el.src = S.audio.url;
+    el.volume = S.settings.volume;
+    el.currentTime = 0;
+    el.play().catch(e => toast('❌ ' + e.message));
+  };
+  $('#volume').oninput = e => {
+    S.settings.volume = +e.target.value / 100;
+    $('#volumeVal').textContent = e.target.value + '%';
+    saveState();
+  };
+  $('#repeat').oninput = e => {
+    S.settings.repeat = +e.target.value;
+    $('#repeatVal').textContent = e.target.value + 'x';
+    saveState();
+  };
+  $('#swAudioOn').onclick = e => toggleSwitch(e.currentTarget, 'audioOn');
+  $('#swPauseMic').onclick = e => toggleSwitch(e.currentTarget, 'pauseWhilePlay');
+  $('#swLightOn').onclick = e => toggleSwitch(e.currentTarget, 'lightOn');
+  $('#swVibrate').onclick = e => toggleSwitch(e.currentTarget, 'vibrate');
+  $('#swTts').onclick = e => toggleSwitch(e.currentTarget, 'ttsOn');
+  $('#swContinuous').onclick = e => toggleSwitch(e.currentTarget, 'continuous');
+  $('#swWake').onclick = async e => {
+    toggleSwitch(e.currentTarget, 'wakeLock');
+    if (S.settings.wakeLock) await requestWakeLock();
+    else releaseWakeLock();
+  };
+
+  // ---- LIGHT ----
+  $('#flashMode').onchange = e => {
+    S.settings.flashMode = e.target.value;
+    saveState();
+    if (e.target.value === 'torch' || e.target.value === 'both') initTorch();
+  };
+  $('#flashDur').oninput = e => {
+    S.settings.flashDuration = +e.target.value;
+    const d = +e.target.value;
+    $('#flashDurVal').textContent = d < 1000 ? d + ' ms' : (d/1000).toFixed(1) + ' detik';
+    saveState();
+  };
+  $('#strobeSpeed').oninput = e => {
+    S.settings.strobeSpeed = +e.target.value;
+    const labels = ['Sangat Lambat','Lambat','Lambat','Sedang','Sedang','Sedang','Cepat','Cepat','Sangat Cepat','Turbo'];
+    $('#strobeSpeedVal').textContent = labels[+e.target.value - 1] || 'Sedang';
+    saveState();
+  };
+  $('#flashColor').oninput = e => {
+    S.settings.flashColor = e.target.value;
+    saveState();
+  };
+  $('#btnTestLight').onclick = () => {
+    if (!S.runtime.torch.available) initTorch();
+    doFlash();
+    vibrate(30);
+  };
+  $('#btnStopLight').onclick = () => {
+    clearFlashTimers();
+    toast('⏹ Lampu dimatikan');
+  };
+
+  // Color presets
+  const colors = ['#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#00ffff','#ff00ff','#ff8800','#ff69b4'];
+  const cp = $('#flashColorPresets');
+  colors.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'color-preset';
+    b.style.background = c;
+    b.onclick = () => {
+      S.settings.flashColor = c;
+      $('#flashColor').value = c;
+      saveState();
+    };
+    cp.appendChild(b);
+  });
+
+  // ---- HISTORY ----
+  $('#btnClearHistory').onclick = () => {
+    if (!confirm('Hapus semua riwayat?')) return;
+    S.history = [];
+    S.stats.triggers = 0;
+    saveState();
+    updateHistoryUI();
+    updateStatsUI();
+    toast('🗑 Riwayat dihapus');
+  };
+  $('#btnExportHistory').onclick = () => {
+    if (!S.history.length) return toast('Riwayat kosong');
+    const text = S.history.map(h => {
+      const d = new Date(h.time).toLocaleString('id-ID');
+      return `${d}\t${h.word}\t"${h.transcript}"`;
+    }).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'voicetrigger-history.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('📤 Ekspor selesai');
+  };
+
+  // ---- SETTINGS ----
+  $('#langSelect').onchange = e => {
+    S.settings.lang = e.target.value;
+    saveState();
+    if (S.runtime.listening) {
+      stopListening();
+      setTimeout(() => startListening(), 500);
+    }
+  };
+  $('#cooldown').oninput = e => {
+    S.settings.cooldown = +e.target.value;
+    $('#cooldownVal').textContent = e.target.value + ' detik';
+    saveState();
+  };
+  $('#btnSaveAll').onclick = () => {
+    saveState();
+    toast('💾 Semua tersimpan');
+  };
+  $('#btnLoadAll').onclick = () => {
+    loadState();
+    syncAllUI();
+    toast('📂 Dimuat');
+  };
+  $('#btnExportAll').onclick = () => {
+    const data = {
+      words: S.words,
+      settings: S.settings,
+      stats: S.stats,
+      history: S.history,
+      exported: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'voicetrigger-backup.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('📤 Backup terunduh');
+  };
+  $('#btnImportAll').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try {
+        const text = await f.text();
+        const d = JSON.parse(text);
+        if (d.words) S.words = d.words;
+        if (d.settings) S.settings = { ...S.settings, ...d.settings };
+        if (d.stats) S.stats = d.stats;
+        if (d.history) S.history = d.history;
+        saveState();
+        syncAllUI();
+        toast('📥 Berhasil impor');
+      } catch(err) { toast('❌ File tidak valid'); }
+    };
+    input.click();
+  };
+  $('#btnTheme').onclick = () => {
+    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = next;
+    S.settings.theme = next;
+    $('#btnTheme').textContent = next === 'dark' ? '🌙 Mode Gelap' : '☀️ Mode Terang';
+    saveState();
+  };
+  $('#btnReset').onclick = () => {
+    if (!confirm('Reset SEMUA data (kata, pengaturan, riwayat)?')) return;
+    localStorage.removeItem(STORE_KEY);
+    location.reload();
+  };
+}
+
+function toggleSwitch(el, key) {
+  el.classList.toggle('on');
+  S.settings[key] = el.classList.contains('on');
+  saveState();
+}
+
+// ===== SYNC UI =====
+function syncAllUI() {
+  // Words
+  updateWordsList();
+  updateActiveWordsUI();
+  // Match mode
+  $('#matchMode').value = S.settings.matchMode;
+  $('#fuzzyGroup').style.display = S.settings.matchMode === 'fuzzy' ? '' : 'none';
+  $('#fuzzyTolerance').value = S.settings.fuzzyTolerance;
+  $('#fuzzyVal').textContent = S.settings.fuzzyTolerance;
+  // Audio
+  updateAudioUI();
+  $('#volume').value = S.settings.volume * 100;
+  $('#volumeVal').textContent = Math.round(S.settings.volume*100) + '%';
+  $('#repeat').value = S.settings.repeat;
+  $('#repeatVal').textContent = S.settings.repeat + 'x';
+  // Switches
+  setSwitch('#swAudioOn', S.settings.audioOn);
+  setSwitch('#swPauseMic', S.settings.pauseWhilePlay);
+  setSwitch('#swLightOn', S.settings.lightOn);
+  setSwitch('#swVibrate', S.settings.vibrate);
+  setSwitch('#swTts', S.settings.ttsOn);
+  setSwitch('#swWake', S.settings.wakeLock);
+  setSwitch('#swContinuous', S.settings.continuous);
+  // Light
+  $('#flashMode').value = S.settings.flashMode;
+  $('#flashDur').value = S.settings.flashDuration;
+  const d = S.settings.flashDuration;
+  $('#flashDurVal').textContent = d < 1000 ? d + ' ms' : (d/1000).toFixed(1) + ' detik';
+  $('#strobeSpeed').value = S.settings.strobeSpeed;
+  $('#flashColor').value = S.settings.flashColor;
+  // Settings
+  $('#langSelect').value = S.settings.lang;
+  $('#cooldown').value = S.settings.cooldown;
+  $('#cooldownVal').textContent = S.settings.cooldown + ' detik';
+  // Theme
+  document.body.dataset.theme = S.settings.theme;
+  $('#btnTheme').textContent = S.settings.theme === 'dark' ? '🌙 Mode Gelap' : '☀️ Mode Terang';
+  // Stats
+  updateStatsUI();
+  updateHistoryUI();
+}
+
+function setSwitch(sel, val) {
+  const el = $(sel);
+  if (val) el.classList.add('on');
+  else el.classList.remove('on');
+}
+
+// ===== INIT =====
+function init() {
+  loadState();
+  bindUI();
+  syncAllUI();
+  initBattery();
+  initTorch();
+
+  // Restore flash color / mode visual
+  const sp = (v) => {
+    const labels = ['Sangat Lambat','Lambat','Lambat','Sedang','Sedang','Sedang','Cepat','Cepat','Sangat Cepat','Turbo'];
+    $('#strobeSpeedVal').textContent = labels[v - 1] || 'Sedang';
+  };
+  sp(S.settings.strobeSpeed);
+
+  // Request mic permission on first audio interaction
+  const initAudioOnce = () => {
+    if (S.settings.audioOn || S.settings.lightOn) {
+      // trigger torch init once more in case
+      if (!S.runtime.torch.available) initTorch();
+    }
+    document.removeEventListener('click', initAudioOnce);
+  };
+  document.addEventListener('click', initAudioOnce, { once: true });
+
+  // Handle visibility
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // Page hidden - wake lock may auto-release
+    } else {
+      if (S.runtime.listening && !S.runtime.wakeLockObj && S.settings.wakeLock) {
+        requestWakeLock();
+      }
     }
   });
-  
-  // Fullscreen button state
-  document.addEventListener('fullscreenchange', () => {
-    $('#btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
-  });
-}
 
-function updateAllUI() {
-  updateTorchButton();
-  updateStrobeButton();
-  updatePatternUI();
-  $('#btnStartSound').textContent = S.sound.on ? '⏹ STOP SOUND MODE' : '🔊 ACTIVATE SOUND LIGHT';
-  $('#btnStartSound').classList.toggle('btn-primary', !S.sound.on);
-  $('#btnStartSound').classList.toggle('btn-danger', S.sound.on);
-}
-
-// ============================================
-// INIT
-// ============================================
-async function init() {
-  bindUI();
-  initBattery();
-  updateStrobeFreq();
-  updateStatsUI();
-  
-  // Restore theme
-  if (localStorage.getItem('flashmaster_theme') === 'light') {
-    document.body.dataset.theme = 'light';
-    $('#btnTheme').textContent = '☀️';
+  // Warn if unsupported
+  if (!getSpeechRecognition()) {
+    showStatus('error', 'Browser tidak mendukung. Pakai Chrome di Android.');
   }
-  
-  // Try torch init on first user gesture (better on mobile)
-  const initTorchOnce = () => {
-    initTorch();
-    document.removeEventListener('click', initTorchOnce);
-    document.removeEventListener('touchstart', initTorchOnce);
-  };
-  document.addEventListener('click', initTorchOnce, { once: true });
-  document.addEventListener('touchstart', initTorchOnce, { once: true });
-  
-  // Also try immediately
-  initTorch().catch(() => {});
-  
-  toast('⚡ FlashMaster Pro ready');
+
+  toast('🎙️ Voice Trigger Pro siap');
 }
-
-// Save theme on change
-const origToggleTheme = toggleTheme;
-document.addEventListener('click', e => {
-  if (e.target.id === 'btnTheme' || e.target.closest('#btnTheme')) {
-    setTimeout(() => {
-      localStorage.setItem('flashmaster_theme', document.body.dataset.theme);
-    }, 50);
-  }
-});
-
-// Handle page visibility (release wake lock when hidden)
-document.addEventListener('visibilitychange', async () => {
-  if (document.hidden) {
-    // pause expensive loops
-  } else {
-    // resume
-    if (S.sound.analyser && !S.sound.raf) startSoundLoop();
-  }
-});
 
 // Cleanup
 window.addEventListener('beforeunload', () => {
-  if (S.torch.stream) S.torch.stream.getTracks().forEach(t => t.stop());
-  if (S.sound.stream) S.sound.stream.getTracks().forEach(t => t.stop());
-  if (S.wake) S.wake.release();
+  if (S.audio.isObjectURL && S.audio.url) URL.revokeObjectURL(S.audio.url);
+  if (S.runtime.torch.stream) S.runtime.torch.stream.getTracks().forEach(t => t.stop());
+  releaseWakeLock();
 });
 
-// Start
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
