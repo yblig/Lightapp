@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>⚡ FlashMaster Pro</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07090f;--bg-2:#0f1219;--card:#151a24;--card-2:#1c222e;
+  --border:#232a38;--text:#e8ecf4;--text-dim:#7d8798;
+  --accent:#fbbf24;--accent-2:#f59e0b;--danger:#ef4444;
+  --success:#10b981;--info:#3b82f6;--radius:14px;
+  --shadow:0 4px 20px rgba(0,0,0,.4);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--bg-2:#fff;--card:#fff;--card-2:#f8fafc;
+  --border:#e2e8f0;--text:#0f172a;--text-dim:#64748b;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);user-select:none;
+  -webkit-font-smoothing:antialiased;transition:background .3s,color .3s;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+input,select{font:inherit;color:inherit}
+
+/* === LIGHT OVERLAY === */
+.light-overlay{
+  position:fixed;inset:0;background:#fff;opacity:0;
+  pointer-events:none;z-index:9000;display:none;
+  transition:opacity .04s linear;
+}
+.light-overlay.active{display:block}
+.light-overlay.on{opacity:1}
+
+/* === FLOATING BAR === */
+.floating-bar{
+  position:fixed;bottom:max(24px,env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%) translateY(120%);
+  z-index:10000;display:flex;gap:10px;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+.floating-bar.visible{transform:translateX(-50%) translateY(0);pointer-events:auto}
+.btn-stop{
+  background:rgba(239,68,68,.95);color:#fff;
+  padding:14px 32px;border-radius:50px;font-weight:700;
+  font-size:16px;letter-spacing:.5px;box-shadow:0 8px 32px rgba(239,68,68,.5);
+  backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);
+}
+.btn-stop:active{transform:scale(.95)}
+
+/* === APP LAYOUT === */
+.app{height:100%;display:flex;flex-direction:column}
+body.light-mode .app{visibility:hidden}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;background:var(--bg-2);border-bottom:1px solid var(--border);
+  gap:12px;flex-shrink:0;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;font-size:22px;
+  box-shadow:0 4px 16px rgba(251,191,36,.35);
+}
+.brand h1{font-size:16px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand .sub{font-size:11px;color:var(--text-dim);margin-top:1px}
+.status{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.chip{
+  display:flex;align-items:center;gap:4px;padding:6px 10px;
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  font-size:11px;font-weight:600;color:var(--text-dim);
+}
+.chip.active{color:var(--accent);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1)}
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;background:var(--card);
+  border:1px solid var(--border);display:grid;place-items:center;font-size:16px;
+  transition:all .2s;
+}
+.icon-btn:active{transform:scale(.92)}
+.icon-btn.active{background:rgba(251,191,36,.15);border-color:var(--accent);color:var(--accent)}
+
+/* === TABS === */
+.tabs{
+  display:flex;gap:4px;padding:10px 14px;background:var(--bg-2);
+  border-bottom:1px solid var(--border);overflow-x:auto;
+  scrollbar-width:none;flex-shrink:0;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;
+  color:var(--text-dim);white-space:nowrap;transition:all .2s;
+}
+.tab.active{background:var(--accent);color:#000;box-shadow:0 2px 12px rgba(251,191,36,.3)}
+
+/* === CONTENT === */
+.content{flex:1;overflow-y:auto;padding:16px;scroll-behavior:smooth}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.tab-panel{display:none;animation:fade .3s ease}
+.tab-panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;
+  transition:border-color .2s;
+}
+.card-title{
+  font-size:12px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--text-dim);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* === BUTTONS === */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:12px;font-weight:700;font-size:15px;
+  background:var(--card-2);border:1px solid var(--border);
+  transition:all .15s;width:100%;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#000;border:none;box-shadow:0 4px 20px rgba(251,191,36,.3)}
+.btn-danger{background:var(--danger);color:#fff;border:none}
+.btn-success{background:var(--success);color:#fff;border:none}
+.btn-ghost{background:transparent}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* === POWER BUTTON === */
+.power-btn{
+  width:140px;height:140px;border-radius:50%;margin:0 auto 18px;
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 30% 30%,var(--card-2),var(--card));
+  border:3px solid var(--border);font-size:56px;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.power-btn:active{transform:scale(.93)}
+.power-btn.on{
+  background:radial-gradient(circle at 30% 30%,#fde68a,var(--accent));
+  border-color:var(--accent);color:#000;
+  box-shadow:0 0 60px rgba(251,191,36,.6),inset 0 0 40px rgba(255,255,255,.3);
+}
+
+/* === SLIDERS === */
+.slider-group{margin-bottom:16px}
+.slider-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;font-weight:600;margin-bottom:8px;
+}
+.slider-label .val{
+  color:var(--accent);font-variant-numeric:tabular-nums;
+  background:rgba(251,191,36,.1);padding:2px 10px;border-radius:8px;font-size:12px;
+}
+input[type="range"]{
+  -webkit-appearance:none;width:100%;height:8px;border-radius:4px;
+  background:var(--border);outline:none;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+  box-shadow:0 2px 10px rgba(251,191,36,.5);border:2px solid #fff;
+}
+input[type="range"]::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;background:var(--accent);
+  cursor:pointer;border:2px solid #fff;box-shadow:0 2px 10px rgba(251,191,36,.5);
+}
+
+/* === COLOR PICKER === */
+.color-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.color-input{
+  width:56px;height:56px;padding:0;border:none;border-radius:12px;
+  cursor:pointer;background:transparent;flex-shrink:0;
+}
+.color-input::-webkit-color-swatch-wrapper{padding:0}
+.color-input::-webkit-color-swatch{border:2px solid var(--border);border-radius:12px}
+.color-presets{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.color-preset{
+  width:32px;height:32px;border-radius:8px;border:2px solid var(--border);
+  transition:transform .15s;
+}
+.color-preset:active{transform:scale(.88)}
+
+/* === METER === */
+.meter{
+  height:14px;background:var(--bg);border-radius:7px;overflow:hidden;
+  position:relative;margin-bottom:8px;border:1px solid var(--border);
+}
+.meter-fill{
+  height:100%;width:0%;border-radius:7px;transition:width .05s linear;
+  background:linear-gradient(90deg,#10b981,#fbbf24,#ef4444);
+}
+.meter-threshold{
+  position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;
+  box-shadow:0 0 6px rgba(255,255,255,.8);border-radius:1px;
+  transition:left .1s;
+}
+.meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:14px}
+
+#spectrum{
+  width:100%;height:70px;border-radius:10px;
+  background:var(--bg);margin-bottom:12px;display:block;
+}
+
+/* === PATTERNS GRID === */
+.pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pattern-btn{
+  padding:16px 12px;border-radius:12px;background:var(--card-2);
+  border:1px solid var(--border);font-size:13px;font-weight:600;
+  transition:all .15s;display:flex;flex-direction:column;
+  align-items:center;gap:6px;
+}
+.pattern-btn:active{transform:scale(.95)}
+.pattern-btn:hover{border-color:var(--accent)}
+.pattern-btn .emoji{font-size:24px}
+.pattern-btn.active{
+  background:rgba(251,191,36,.15);border-color:var(--accent);color:var(--accent);
+}
+
+/* === SELECT / TOGGLE === */
+select{
+  width:100%;padding:12px;border-radius:10px;background:var(--bg);
+  border:1px solid var(--border);margin-bottom:12px;
+}
+.toggle-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row .label{font-size:14px;font-weight:600}
+.toggle-row .desc{font-size:11px;color:var(--text-dim);margin-top:2px}
+.switch{
+  position:relative;width:48px;height:28px;border-radius:14px;
+  background:var(--border);transition:background .2s;flex-shrink:0;
+}
+.switch::after{
+  content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;
+  border-radius:50%;background:#fff;transition:transform .2s;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.switch.on{background:var(--accent)}
+.switch.on::after{transform:translateX(20px)}
+
+/* === STATS === */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{
+  background:var(--bg);border-radius:10px;padding:14px;text-align:center;
+  border:1px solid var(--border);
+}
+.stat .num{font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* === TOAST === */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:var(--card);border:1px solid var(--border);padding:12px 20px;
+  border-radius:12px;font-size:13px;font-weight:600;z-index:11000;
+  box-shadow:var(--shadow);transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  max-width:90vw;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* === COUNTDOWN === */
+.countdown-overlay{
+  position:fixed;inset:0;z-index:9500;
+  display:grid;place-items:center;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  font-size:140px;font-weight:800;color:var(--accent);
+  animation:countPop 1s ease-out infinite;
+}
+@keyframes countPop{
+  0%{transform:scale(.5);opacity:0}
+  30%{transform:scale(1.1);opacity:1}
+  100%{transform:scale(1);opacity:.8}
+}
+
+/* === FEATURE LIST === */
+.feature-list{
+  display:grid;grid-template-columns:1fr;gap:6px;
+  font-size:12px;color:var(--text-dim);
+}
+.feature-list li{
+  padding:6px 10px;background:var(--bg);border-radius:8px;
+  border-left:3px solid var(--accent);list-style:none;
+}
+
+/* === KBD === */
+kbd{
+  background:var(--bg);padding:2px 7px;border-radius:5px;
+  font-family:monospace;font-size:11px;border:1px solid var(--border);
+}
+
+/* === MISC === */
+.hidden{display:none!important}
+.hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:8px}
+.gap{height:8px}
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="lightOverlay" class="light-overlay"></div>
+<div id="floatingBar" class="floating-bar">
+  <button id="btnStopLight" class="btn-stop">✕ STOP</button>
+</div>
+
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">⚡</div>
+      <div>
+        <h1>FlashMaster Pro</h1>
+        <div class="sub">Ultimate Flashlight Toolkit</div>
+      </div>
+    </div>
+    <div class="status">
+      <div class="chip" id="chipBattery">🔋 --</div>
+      <div class="chip" id="chipWake">💤</div>
+      <button class="icon-btn" id="btnTheme" title="Theme">🌙</button>
+      <button class="icon-btn" id="btnFullscreen" title="Fullscreen">⛶</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="main">⚡ Main</button>
+    <button class="tab" data-tab="strobe">💥 Strobe</button>
+    <button class="tab" data-tab="sound">🎤 Sound</button>
+    <button class="tab" data-tab="patterns">🎨 Patterns</button>
+    <button class="tab" data-tab="tools">🛠️ Tools</button>
+    <button class="tab" data-tab="about">📋 Info</button>
+  </nav>
+
+  <main class="content">
+    <!-- ===== MAIN ===== -->
+    <section class="tab-panel active" id="tab-main">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Master Light Control</div>
+        <button class="power-btn" id="powerBtn">🔌</button>
+        <div class="btn-row">
+          <button class="btn" id="btnTorch">🔦 Torch</button>
+          <button class="btn" id="btnScreen">💡 Screen</button>
+        </div>
+        <div class="hint">Tap the big button for full white light. Torch uses your device's camera flash (mobile).</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Screen Light Settings</div>
+        <div class="color-row">
+          <input type="color" class="color-input" id="colorPicker" value="#ffffff">
+          <div class="color-presets" id="colorPresets"></div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Brightness</span><span class="val" id="brightnessVal">100%</span></div>
+          <input type="range" id="brightness" min="1" max="100" value="100">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Quick Presets</div>
+        <div class="btn-row-3">
+          <button class="btn" data-quick="#ffffff">⚪ White</button>
+          <button class="btn" data-quick="#ff0000">🔴 Red</button>
+          <button class="btn" data-quick="#00ff00">🟢 Green</button>
+        </div>
+        <div class="gap"></div>
+        <div class="btn-row-3">
+          <button class="btn" data-quick="#0000ff">🔵 Blue</button>
+          <button class="btn" data-quick="#ffff00">🟡 Yellow</button>
+          <button class="btn" data-quick="#ff00ff">🟣 Magenta</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STROBE ===== -->
+    <section class="tab-panel" id="tab-strobe">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Strobe Configuration</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>ON Duration</span><span class="val" id="onMsVal">80 ms</span></div>
+          <input type="range" id="onMs" min="10" max="2000" value="80" step="10">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>OFF Duration</span><span class="val" id="offMsVal">120 ms</span></div>
+          <input type="range" id="offMs" min="10" max="2000" value="120" step="10">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Frequency</span><span class="val" id="freqVal">5.0 Hz</span></div>
+          <div class="hint">Adjust both durations to change frequency. Lower = slower, higher = faster.</div>
+        </div>
+        <button class="btn btn-primary" id="btnStartStrobe">💥 START STROBE</button>
+        <div class="gap"></div>
+        <div class="btn-row-3">
+          <button class="btn" data-strobe="200,400">🐢 Slow</button>
+          <button class="btn" data-strobe="80,120">🚶 Medium</button>
+          <button class="btn" data-strobe="30,30">⚡ Fast</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SOUND ===== -->
+    <section class="tab-panel" id="tab-sound">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Microphone Setup</div>
+        <select id="micSelect">
+          <option value="">Default Microphone</option>
+        </select>
+        <button class="btn" id="btnTestMic">🎤 ENABLE MIC / TEST</button>
+        <div class="gap"></div>
+        <div class="meter"><div class="meter-fill" id="meterFill"></div><div class="meter-threshold" id="meterThresh" style="left:15%"></div></div>
+        <div class="meter-labels"><span>Silent</span><span>Loud</span></div>
+        <canvas id="spectrum"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Sound Reactivity</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Sensitivity Threshold</span><span class="val" id="thresholdVal">8%</span></div>
+          <input type="range" id="threshold" min="1" max="80" value="8">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Flash Duration</span><span class="val" id="flashMsVal">120 ms</span></div>
+          <input type="range" id="flashMs" min="20" max="2000" value="120" step="10">
+        </div>
+        <button class="btn btn-primary" id="btnStartSound">🔊 ACTIVATE SOUND LIGHT</button>
+        <div class="hint">The light will flash whenever sound exceeds the threshold. Great for parties, clap-to-light, etc.</div>
+      </div>
+    </section>
+
+    <!-- ===== PATTERNS ===== -->
+    <section class="tab-panel" id="tab-patterns">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Light Patterns</div>
+        <div class="pattern-grid" id="patternGrid"></div>
+        <div class="hint">Tap any pattern to start. Light will cycle through the pattern continuously.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Pattern Speed</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Speed Multiplier</span><span class="val" id="speedVal">1.0x</span></div>
+          <input type="range" id="patternSpeed" min="25" max="300" value="100">
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TOOLS ===== -->
+    <section class="tab-panel" id="tab-tools">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Session Tools</div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Keep Screen Awake</div>
+            <div class="desc">Prevents screen from sleeping</div>
+          </div>
+          <div class="switch" id="swWake"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Vibration Feedback</div>
+            <div class="desc">Vibrate on mode activation</div>
+          </div>
+          <div class="switch on" id="swVibrate"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Countdown</div>
+            <div class="desc">3-second countdown before start</div>
+          </div>
+          <div class="switch" id="swCountdown"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Auto-Stop Timer</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Auto-Stop After</span><span class="val" id="autoStopVal">Off</span></div>
+          <input type="range" id="autoStop" min="0" max="300" value="0" step="10">
+        </div>
+        <div class="hint">0 = disabled. Otherwise light turns off automatically after set seconds.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Statistics</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="num" id="statBlinks">0</div><div class="lbl">Flashes</div></div>
+          <div class="stat"><div class="num" id="statRuntime">0s</div><div class="lbl">Runtime</div></div>
+          <div class="stat"><div class="num" id="statFreq">0</div><div class="lbl">Peak Hz</div></div>
+          <div class="stat"><div class="num" id="statBattery">--</div><div class="lbl">Battery</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Presets</div>
+        <div class="btn-row">
+          <button class="btn" id="btnSavePreset">💾 Save</button>
+          <button class="btn" id="btnLoadPreset">📂 Load</button>
+        </div>
+        <div class="gap"></div>
+        <div class="btn-row">
+          <button class="btn" id="btnExport">📤 Export</button>
+          <button class="btn" id="btnImport">📥 Import</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Keyboard Shortcuts</div>
+        <div class="feature-list">
+          <li><kbd>Space</kbd> Toggle light on/off</li>
+          <li><kbd>F</kbd> Toggle fullscreen</li>
+          <li><kbd>S</kbd> Start/stop strobe</li>
+          <li><kbd>Esc</kbd> Stop all modes</li>
+          <li><kbd>T</kbd> Toggle theme</li>
+          <li><kbd>1-6</kbd> Switch tabs</li>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="tab-panel" id="tab-about">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>About FlashMaster Pro</div>
+        <p style="font-size:13px;line-height:1.7;color:var(--text-dim)">
+          A powerful all-in-one flashlight toolkit that works entirely in your browser.
+          No installation, no tracking, no ads. Everything runs locally on your device.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Complete Feature List (40+)</div>
+        <ul class="feature-list">
+          <li>✓ Fullscreen mode</li>
+          <li>✓ Device torch (camera flash) control</li>
+          <li>✓ Full-screen colored light</li>
+          <li>✓ Brightness slider (1-100%)</li>
+          <li>✓ Color picker + 6 presets</li>
+          <li>✓ Strobe with adjustable ON/OFF durations</li>
+          <li>✓ Live frequency display</li>
+          <li>✓ Strobe speed presets (Slow/Med/Fast)</li>
+          <li>✓ Sound-activated flashing</li>
+          <li>✓ Microphone selection</li>
+          <li>✓ Sound level meter with threshold marker</li>
+          <li>✓ Live audio spectrum visualizer</li>
+          <li>✓ Adjustable sound sensitivity</li>
+          <li>✓ Adjustable flash duration for sound mode</li>
+          <li>✓ SOS morse pattern</li>
+          <li>✓ Heartbeat pattern</li>
+          <li>✓ Police strobe (red/blue)</li>
+          <li>✓ Disco RGB pattern</li>
+          <li>✓ Candle flicker pattern</li>
+          <li>✓ Beacon slow pulse</li>
+          <li>✓ Rainbow cycle pattern</li>
+          <li>✓ Morse "OK" pattern</li>
+          <li>✓ ECG pattern</li>
+          <li>✓ Party strobe pattern</li>
+          <li>✓ Pattern speed multiplier</li>
+          <li>✓ Wake Lock (keep screen awake)</li>
+          <li>✓ Battery level display</li>
+          <li>✓ Auto-stop timer</li>
+          <li>✓ 3-second countdown</li>
+          <li>✓ Live statistics (flashes, runtime, Hz)</li>
+          <li>✓ Vibration feedback</li>
+          <li>✓ Dark / light theme</li>
+          <li>✓ Save/load presets (localStorage)</li>
+          <li>✓ Export/import settings</li>
+          <li>✓ Keyboard shortcuts</li>
+          <li>✓ Floating stop button</li>
+          <li>✓ Toast notifications</li>
+          <li>✓ Responsive mobile-first design</li>
+          <li>✓ PWA-ready meta tags</li>
+          <li>✓ No tracking, 100% offline capable</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Browser Support</div>
+        <div class="hint">
+          <strong>Torch:</strong> Chrome/Edge on Android. iOS Safari doesn't support torch API.<br>
+          <strong>Microphone:</strong> All modern browsers (requires HTTPS or localhost).<br>
+          <strong>Wake Lock:</strong> Chrome/Edge/Safari 16.4+.<br>
+          <strong>Fullscreen:</strong> All modern browsers.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ============================================
+// UTILITIES
+// ============================================
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+let toastTimer;
+function toast(msg, duration=2000) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function vibrate(pattern) {
+  if (!S.settings.vibration) return;
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+// ============================================
+// STATE
+// ============================================
+const S = {
+  torch: { track: null, stream: null, available: false, on: false },
+  light: { on: false, color: '#ffffff', brightness: 100, activeMode: null },
+  strobe: { on: false, onMs: 80, offMs: 120, timers: [], count: 0, startTime: 0 },
+  sound: {
+    on: false, ctx: null, analyser: null, stream: null, raf: null,
+    threshold: 0.08, flashMs: 120, flashTimer: null, level: 0, testMode: false
+  },
+  pattern: { on: false, name: null, timers: [], step: 0, speed: 1 },
+  wake: null,
+  battery: null,
+  autoStopTimer: null,
+  stats: { blinks: 0, startTime: Date.now(), peakHz: 0 },
+  settings: { vibration: true, theme: 'dark', countdown: false },
+};
+
+// ============================================
+// LIGHT CONTROL
+// ============================================
+const overlay = $('#lightOverlay');
+const floatingBar = $('#floatingBar');
+
+function paintLight() {
+  overlay.style.background = S.light.color;
+  overlay.style.opacity = (S.light.brightness / 100).toString();
+}
+
+function applyTorch(on) {
+  if (!S.torch.track || !S.torch.available) return Promise.resolve(false);
+  return S.torch.track.applyConstraints({ advanced: [{ torch: on }] })
+    .then(() => { S.torch.on = on; return true; })
+    .catch(() => false);
+}
+
+async function setLight(on) {
+  if (on && !S.light.on) {
+    overlay.classList.add('active', 'on');
+    paintLight();
+    S.light.on = true;
+    applyTorch(true);
+    S.stats.blinks++;
+    updateStatsUI();
+  } else if (!on && S.light.on) {
+    overlay.classList.remove('on');
+    S.light.on = false;
+    applyTorch(false);
+    // hide overlay after transition
+    setTimeout(() => {
+      if (!S.light.on) overlay.classList.remove('active');
+    }, 80);
+  }
+}
+
+function showFloatingBar() { floatingBar.classList.add('visible'); }
+function hideFloatingBar() { floatingBar.classList.remove('visible'); }
+
+async function enterLightMode(modeName) {
+  S.light.activeMode = modeName;
+  document.body.classList.add('light-mode');
+  showFloatingBar();
+  if (S.settings.countdown && ['strobe','sound','pattern','manual'].includes(modeName)) {
+    await runCountdown();
+  }
+}
+
+function exitLightMode() {
+  stopAllModes();
+  document.body.classList.remove('light-mode');
+  hideFloatingBar();
+  S.light.activeMode = null;
+  setLight(false);
+  updateAllUI();
+}
+
+// Manual light toggle
+async function toggleManualLight() {
+  if (S.light.on) {
+    exitLightMode();
+  } else {
+    await enterLightMode('manual');
+    setLight(true);
+    vibrate(20);
+  }
+}
+
+// ============================================
+// COUNTDOWN
+// ============================================
+async function runCountdown() {
+  for (let n = 3; n > 0; n--) {
+    const el = document.createElement('div');
+    el.className = 'countdown-overlay';
+    el.textContent = n;
+    document.body.appendChild(el);
+    vibrate(50);
+    await sleep(1000);
+    el.remove();
+  }
+}
+
+// ============================================
+// TORCH
+// ============================================
+async function initTorch() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: 320, height: 240 }
+    });
+    const track = stream.getVideoTracks()[0];
+    const caps = track.getCapabilities ? track.getCapabilities() : {};
+    S.torch.stream = stream;
+    S.torch.track = track;
+    S.torch.available = !!caps.torch;
+    if (!S.torch.available) {
+      // keep track for potential screen light fallback
+      toast('⚠️ Torch not available — screen light works');
+    } else {
+      toast('🔦 Torch ready');
+    }
+  } catch (e) {
+    console.warn('Torch init:', e.message);
+    toast('💡 Screen light mode only');
+  }
+  updateTorchButton();
+}
+
+function updateTorchButton() {
+  const btn = $('#btnTorch');
+  btn.textContent = S.torch.available ? '🔦 Torch Ready' : '🔦 Screen Only';
+}
+
+// ============================================
+// STROBE
+// ============================================
+async function startStrobe() {
+  stopAllModes();
+  await enterLightMode('strobe');
+  S.strobe.on = true;
+  S.strobe.startTime = Date.now();
+  S.strobe.count = 0;
+  vibrate([10, 30, 10]);
+  
+  const cycle = async () => {
+    if (!S.strobe.on) return;
+    await setLight(true);
+    S.strobe.count++;
+    const t1 = setTimeout(async () => {
+      if (!S.strobe.on) return;
+      await setLight(false);
+      const t2 = setTimeout(cycle, S.strobe.offMs);
+      S.strobe.timers.push(t2);
+    }, S.strobe.onMs);
+    S.strobe.timers.push(t1);
+  };
+  cycle();
+  
+  updateStrobeFreq();
+  updateStrobeButton();
+}
+
+function stopStrobe() {
+  S.strobe.on = false;
+  S.strobe.timers.forEach(t => clearTimeout(t));
+  S.strobe.timers = [];
+  updateStrobeButton();
+}
+
+function updateStrobeFreq() {
+  const freq = 1000 / (S.strobe.onMs + S.strobe.offMs);
+  $('#freqVal').textContent = freq.toFixed(1) + ' Hz';
+  if (freq > S.stats.peakHz) {
+    S.stats.peakHz = freq;
+    updateStatsUI();
+  }
+}
+
+function updateStrobeButton() {
+  const btn = $('#btnStartStrobe');
+  if (S.strobe.on) {
+    btn.textContent = '⏹ STOP STROBE';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-danger');
+  } else {
+    btn.textContent = '💥 START STROBE';
+    btn.classList.remove('btn-danger');
+    btn.classList.add('btn-primary');
+  }
+}
+
+// ============================================
+// SOUND
+// ============================================
+async function enableMic() {
+  if (S.sound.ctx) return true;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.6;
+    const source = ctx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    
+    S.sound.stream = stream;
+    S.sound.ctx = ctx;
+    S.sound.analyser = analyser;
+    S.sound.testMode = true;
+    startSoundLoop();
+    populateMicList();
+    toast('🎤 Mic active');
+    return true;
+  } catch (e) {
+    toast('❌ Mic denied: ' + e.message);
+    return false;
+  }
+}
+
+function startSoundLoop() {
+  if (!S.sound.analyser) return;
+  const dataArray = new Uint8Array(S.sound.analyser.fftSize);
+  const freqArray = new Uint8Array(S.sound.analyser.frequencyBinCount);
+  const meter = $('#meterFill');
+  const canvas = $('#spectrum');
+  const canvasCtx = canvas.getContext('2d');
+  
+  // resize canvas
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * dpr;
+  canvas.height = canvas.clientHeight * dpr;
+  canvasCtx.scale(dpr, dpr);
+  
+  const loop = () => {
+    if (!S.sound.analyser) return;
+    S.sound.analyser.getByteTimeDomainData(dataArray);
+    S.sound.analyser.getByteFrequencyData(freqArray);
+    
+    // RMS
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = (dataArray[i] - 128) / 128;
+      sum += v * v;
+    }
+    const rms = Math.min(1, Math.sqrt(sum / dataArray.length) * 2.5);
+    S.sound.level = rms;
+    meter.style.width = (rms * 100) + '%';
+    
+    // spectrum
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    canvasCtx.clearRect(0, 0, w, h);
+    const bars = 32;
+    const step = Math.floor(freqArray.length / bars);
+    const bw = w / bars;
+    for (let i = 0; i < bars; i++) {
+      let v = 0;
+      for (let j = 0; j < step; j++) v = Math.max(v, freqArray[i*step+j]);
+      const bh = (v / 255) * h;
+      const hue = 45 - (i / bars) * 45; // amber to red
+      canvasCtx.fillStyle = `hsl(${40 - i}, 100%, 55%)`;
+      canvasCtx.fillRect(i * bw + 1, h - bh, bw - 2, bh);
+    }
+    
+    // Sound trigger
+    if (S.sound.on && rms > S.sound.threshold) {
+      triggerSoundFlash();
+    }
+    
+    S.sound.raf = requestAnimationFrame(loop);
+  };
+  loop();
+  
+  // populate mic devices
+  navigator.mediaDevices.enumerateDevices().then(devices => {
+    const sel = $('#micSelect');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Default Microphone</option>';
+    devices.filter(d => d.kind === 'audioinput').forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.deviceId;
+      o.textContent = d.label || 'Microphone ' + (sel.options.length);
+      sel.appendChild(o);
+    });
+    sel.value = current;
+  }).catch(() => {});
+}
+
+function populateMicList() { /* called from startSoundLoop */ }
+
+function triggerSoundFlash() {
+  if (S.sound.flashTimer) {
+    clearTimeout(S.sound.flashTimer);
+  } else {
+    setLight(true);
+  }
+  S.sound.flashTimer = setTimeout(() => {
+    setLight(false);
+    S.sound.flashTimer = null;
+  }, S.sound.flashMs);
+}
+
+async function startSoundMode() {
+  stopAllModes();
+  const ok = await enableMic();
+  if (!ok) return;
+  await enterLightMode('sound');
+  S.sound.on = true;
+  vibrate([10, 20, 10]);
+  $('#btnStartSound').textContent = '⏹ STOP SOUND MODE';
+  $('#btnStartSound').classList.remove('btn-primary');
+  $('#btnStartSound').classList.add('btn-danger');
+}
+
+function stopSoundMode() {
+  S.sound.on = false;
+  if (S.sound.flashTimer) {
+    clearTimeout(S.sound.flashTimer);
+    S.sound.flashTimer = null;
+  }
+  $('#btnStartSound').textContent = '🔊 ACTIVATE SOUND LIGHT';
+  $('#btnStartSound').classList.add('btn-primary');
+  $('#btnStartSound').classList.remove('btn-danger');
+}
+
+// ============================================
+// PATTERNS
+// ============================================
+const PATTERNS = {
+  sos: {
+    emoji: '🆘', name: 'SOS',
+    steps: [
+      {on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:350},
+      {on:1,d:450},{on:0,d:150},{on:1,d:450},{on:0,d:150},{on:1,d:450},{on:0,d:350},
+      {on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:150},{on:0,d:1200}
+    ]
+  },
+  heartbeat: {
+    emoji: '❤️', name: 'Heartbeat',
+    steps: [
+      {on:1,d:100},{on:0,d:80},{on:1,d:140},{on:0,d:700}
+    ]
+  },
+  police: {
+    emoji: '🚨', name: 'Police',
+    steps: [
+      {on:1,d:100,c:'#ff0000'},{on:0,d:60},
+      {on:1,d:100,c:'#ff0000'},{on:0,d:60},
+      {on:1,d:100,c:'#0000ff'},{on:0,d:60},
+      {on:1,d:100,c:'#0000ff'},{on:0,d:60},
+      {on:0,d:200}
+    ]
+  },
+  disco: {
+    emoji: '🕺', name: 'Disco',
+    steps: [
+      {on:1,d:80,c:'#ff0000'},{on:0,d:30},
+      {on:1,d:80,c:'#00ff00'},{on:0,d:30},
+      {on:1,d:80,c:'#0000ff'},{on:0,d:30},
+      {on:1,d:80,c:'#ffff00'},{on:0,d:30},
+      {on:1,d:80,c:'#ff00ff'},{on:0,d:30},
+      {on:1,d:80,c:'#00ffff'},{on:0,d:30},
+    ]
+  },
+  candle: {
+    emoji: '🕯️', name: 'Candle',
+    steps: [
+      {on:1,d:100,b:1.0},{on:1,d:80,b:0.7},
+      {on:1,d:120,b:0.9},{on:1,d:60,b:0.5},
+      {on:1,d:150,b:0.8},{on:0,d:40},
+      {on:1,d:90,b:0.6},{on:1,d:100,b:0.9}
+    ]
+  },
+  beacon: {
+    emoji: '🗼', name: 'Beacon',
+    steps: [
+      {on:1,d:150},{on:0,d:1200}
+    ]
+  },
+  rainbow: {
+    emoji: '🌈', name: 'Rainbow',
+    steps: [
+      {on:1,d:200,c:'#ff0000'},{on:1,d:200,c:'#ff8800'},
+      {on:1,d:200,c:'#ffff00'},{on:1,d:200,c:'#00ff00'},
+      {on:1,d:200,c:'#00ffff'},{on:1,d:200,c:'#0000ff'},
+      {on:1,d:200,c:'#8800ff'},{on:1,d:200,c:'#ff00ff'},
+    ]
+  },
+  morseOK: {
+    emoji: '✅', name: 'Morse OK',
+    steps: [
+      // O = ---
+      {on:1,d:400},{on:0,d:150},{on:1,d:400},{on:0,d:150},{on:1,d:400},{on:0,d:350},
+      // K = -.-
+      {on:1,d:400},{on:0,d:150},{on:1,d:150},{on:0,d:150},{on:1,d:400},{on:0,d:1000}
+    ]
+  },
+  ecg: {
+    emoji: '💓', name: 'ECG',
+    steps: [
+      {on:1,d:40},{on:0,d:40},{on:1,d:20},{on:0,d:20},
+      {on:1,d:60},{on:0,d:40},{on:1,d:120},{on:0,d:100},
+      {on:1,d:30},{on:0,d:30},{on:1,d:30},{on:0,d:800}
+    ]
+  },
+  party: {
+    emoji: '🎉', name: 'Party',
+    steps: [
+      {on:1,d:50},{on:0,d:50},{on:1,d:50},{on:0,d:50},
+      {on:1,d:30},{on:0,d:30},{on:1,d:30},{on:0,d:400}
+    ]
+  }
+};
+
+async function startPattern(name) {
+  stopAllModes();
+  const p = PATTERNS[name];
+  if (!p) return;
+  await enterLightMode('pattern');
+  S.pattern.on = true;
+  S.pattern.name = name;
+  S.pattern.step = 0;
+  vibrate([10, 30, 10]);
+  updatePatternUI();
+  
+  const step = async () => {
+    if (!S.pattern.on) return;
+    const st = p.steps[S.pattern.step % p.steps.length];
+    S.pattern.step++;
+    const speed = 100 / S.pattern.speed; // 100/speed
+    
+    if (st.c) S.light.color = st.c;
+    if (st.b !== undefined) {
+      // brightness override (for candle)
+      overlay.style.background = S.light.color;
+      overlay.style.opacity = (st.b * S.light.brightness / 100);
+      overlay.classList.add('active','on');
+      S.light.on = true;
+    } else if (st.on) {
+      await setLight(true);
+    } else {
+      await setLight(false);
+    }
+    
+    const t = setTimeout(step, st.d * speed);
+    S.pattern.timers.push(t);
+  };
+  step();
+}
+
+function stopPattern() {
+  S.pattern.on = false;
+  S.pattern.name = null;
+  S.pattern.timers.forEach(t => clearTimeout(t));
+  S.pattern.timers = [];
+  updatePatternUI();
+}
+
+function updatePatternUI() {
+  $$('.pattern-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.pattern === S.pattern.name);
+  });
+}
+
+// ============================================
+// MODE MANAGER
+// ============================================
+function stopAllModes() {
+  stopStrobe();
+  stopSoundMode();
+  stopPattern();
+  clearTimeout(S.autoStopTimer);
+  if (S.sound.flashTimer) {
+    clearTimeout(S.sound.flashTimer);
+    S.sound.flashTimer = null;
+  }
+}
+
+// ============================================
+// WAKE LOCK
+// ============================================
+async function toggleWakeLock() {
+  if (S.wake) {
+    await S.wake.release();
+    S.wake = null;
+    $('#chipWake').textContent = '💤';
+    $('#chipWake').classList.remove('active');
+    $('#swWake').classList.remove('on');
+    return;
+  }
+  try {
+    S.wake = await navigator.wakeLock.request('screen');
+    $('#chipWake').textContent = '⚡';
+    $('#chipWake').classList.add('active');
+    $('#swWake').classList.add('on');
+    S.wake.addEventListener('release', () => {
+      S.wake = null;
+      $('#chipWake').textContent = '💤';
+      $('#chipWake').classList.remove('active');
+      $('#swWake').classList.remove('on');
+    });
+    toast('🔒 Screen will stay awake');
+  } catch (e) {
+    toast('❌ Wake Lock: ' + e.message);
+  }
+}
+
+// ============================================
+// BATTERY
+// ============================================
+async function initBattery() {
+  if (!('getBattery' in navigator)) {
+    $('#chipBattery').textContent = '🔋 N/A';
+    return;
+  }
+  try {
+    const b = await navigator.getBattery();
+    S.battery = b;
+    const update = () => {
+      const lvl = Math.round(b.level * 100);
+      const icon = b.charging ? '⚡' : (lvl < 20 ? '🪫' : '🔋');
+      $('#chipBattery').textContent = `${icon} ${lvl}%`;
+      $('#statBattery').textContent = lvl + '%';
+      $('#chipBattery').classList.toggle('active', b.charging);
+    };
+    update();
+    b.addEventListener('levelchange', update);
+    b.addEventListener('chargingchange', update);
+  } catch (e) {
+    $('#chipBattery').textContent = '🔋 --';
+  }
+}
+
+// ============================================
+// FULLSCREEN
+// ============================================
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      $('#btnFullscreen').classList.add('active');
+      toast('⛶ Fullscreen ON');
+    } else {
+      await document.exitFullscreen();
+      $('#btnFullscreen').classList.remove('active');
+    }
+  } catch (e) {
+    toast('❌ ' + e.message);
+  }
+}
+
+// ============================================
+// THEME
+// ============================================
+function toggleTheme() {
+  const cur = document.body.dataset.theme;
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.body.dataset.theme = next;
+  $('#btnTheme').textContent = next === 'dark' ? '🌙' : '☀️';
+  S.settings.theme = next;
+}
+
+// ============================================
+// STATS
+// ============================================
+function updateStatsUI() {
+  $('#statBlinks').textContent = S.stats.blinks;
+  const secs = Math.floor((Date.now() - S.stats.startTime) / 1000);
+  $('#statRuntime').textContent = secs < 60 ? secs + 's' : Math.floor(secs/60) + 'm' + (secs%60) + 's';
+  $('#statFreq').textContent = S.stats.peakHz.toFixed(1);
+}
+
+setInterval(updateStatsUI, 1000);
+
+// ============================================
+// AUTO STOP
+// ============================================
+function setAutoStop(seconds) {
+  clearTimeout(S.autoStopTimer);
+  if (seconds <= 0) return;
+  S.autoStopTimer = setTimeout(() => {
+    exitLightMode();
+    toast('⏱️ Auto-stop triggered');
+  }, seconds * 1000);
+}
+
+// ============================================
+// PRESETS
+// ============================================
+function savePreset() {
+  const p = {
+    color: S.light.color,
+    brightness: S.light.brightness,
+    strobeOn: S.strobe.onMs,
+    strobeOff: S.strobe.offMs,
+    threshold: S.sound.threshold,
+    flashMs: S.sound.flashMs,
+    patternSpeed: S.pattern.speed,
+    settings: S.settings,
+  };
+  localStorage.setItem('flashmaster_preset', JSON.stringify(p));
+  toast('💾 Preset saved');
+}
+
+function loadPreset() {
+  const raw = localStorage.getItem('flashmaster_preset');
+  if (!raw) return toast('❌ No saved preset');
+  try {
+    const p = JSON.parse(raw);
+    if (p.color) { S.light.color = p.color; $('#colorPicker').value = p.color; }
+    if (p.brightness) { S.light.brightness = p.brightness; $('#brightness').value = p.brightness; $('#brightnessVal').textContent = p.brightness + '%'; }
+    if (p.strobeOn) { S.strobe.onMs = p.strobeOn; $('#onMs').value = p.strobeOn; $('#onMsVal').textContent = p.strobeOn + ' ms'; }
+    if (p.strobeOff) { S.strobe.offMs = p.strobeOff; $('#offMs').value = p.strobeOff; $('#offMsVal').textContent = p.strobeOff + ' ms'; }
+    if (p.threshold) { S.sound.threshold = p.threshold; $('#threshold').value = p.threshold * 100; $('#thresholdVal').textContent = Math.round(p.threshold*100) + '%'; $('#meterThresh').style.left = (p.threshold * 100) + '%'; }
+    if (p.flashMs) { S.sound.flashMs = p.flashMs; $('#flashMs').value = p.flashMs; $('#flashMsVal').textContent = p.flashMs + ' ms'; }
+    if (p.patternSpeed) { S.pattern.speed = p.patternSpeed; $('#patternSpeed').value = p.patternSpeed * 100; $('#speedVal').textContent = p.patternSpeed.toFixed(1) + 'x'; }
+    if (p.settings) S.settings = { ...S.settings, ...p.settings };
+    updateStrobeFreq();
+    toast('📂 Preset loaded');
+  } catch(e) { toast('❌ Failed to load'); }
+}
+
+function exportSettings() {
+  const p = {
+    color: S.light.color, brightness: S.light.brightness,
+    strobeOn: S.strobe.onMs, strobeOff: S.strobe.offMs,
+    threshold: S.sound.threshold, flashMs: S.sound.flashMs,
+    patternSpeed: S.pattern.speed, settings: S.settings,
+  };
+  const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flashmaster-config.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 Exported');
+}
+
+function importSettings() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const p = JSON.parse(text);
+      localStorage.setItem('flashmaster_preset', JSON.stringify(p));
+      loadPreset();
+    } catch(e) { toast('❌ Invalid file'); }
+  };
+  input.click();
+}
+
+// ============================================
+// UI BINDINGS
+// ============================================
+function bindUI() {
+  // Tabs
+  $$('.tab').forEach(t => {
+    t.onclick = () => {
+      $$('.tab').forEach(x => x.classList.remove('active'));
+      $$('.tab-panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      $('#tab-' + t.dataset.tab).classList.add('active');
+    };
+  });
+  
+  // Fullscreen
+  $('#btnFullscreen').onclick = toggleFullscreen;
+  document.addEventListener('fullscreenchange', () => {
+    $('#btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
+  });
+  
+  // Theme
+  $('#btnTheme').onclick = toggleTheme;
+  
+  // Power button
+  $('#powerBtn').onclick = toggleManualLight;
+  $('#btnScreen').onclick = toggleManualLight;
+  $('#btnTorch').onclick = async () => {
+    if (S.torch.available) {
+      const on = !S.torch.on;
+      await applyTorch(on);
+      toast(on ? '🔦 Torch ON' : '🔦 Torch OFF');
+      vibrate(15);
+    } else {
+      toast('🔦 Torch not supported — using screen');
+      toggleManualLight();
+    }
+  };
+  
+  // Color
+  $('#colorPicker').oninput = e => {
+    S.light.color = e.target.value;
+    if (S.light.on) paintLight();
+  };
+  
+  // Color presets
+  const colors = ['#ffffff','#ff0000','#ff8800','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#ff69b4','#8b00ff'];
+  const cp = $('#colorPresets');
+  colors.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'color-preset';
+    btn.style.background = c;
+    btn.onclick = () => {
+      S.light.color = c;
+      $('#colorPicker').value = c;
+      if (S.light.on) paintLight();
+    };
+    cp.appendChild(btn);
+  });
+  
+  // Quick presets
+  $$('[data-quick]').forEach(b => {
+    b.onclick = () => {
+      S.light.color = b.dataset.quick;
+      $('#colorPicker').value = b.dataset.quick;
+      if (S.light.on) paintLight();
+      toast('🎨 Color applied');
+    };
+  });
+  
+  // Brightness
+  $('#brightness').oninput = e => {
+    S.light.brightness = +e.target.value;
+    $('#brightnessVal').textContent = e.target.value + '%';
+    if (S.light.on) paintLight();
+  };
+  
+  // Strobe
+  $('#onMs').oninput = e => {
+    S.strobe.onMs = +e.target.value;
+    $('#onMsVal').textContent = e.target.value + ' ms';
+    updateStrobeFreq();
+  };
+  $('#offMs').oninput = e => {
+    S.strobe.offMs = +e.target.value;
+    $('#offMsVal').textContent = e.target.value + ' ms';
+    updateStrobeFreq();
+  };
+  $$('[data-strobe]').forEach(b => {
+    b.onclick = () => {
+      const [on, off] = b.dataset.strobe.split(',').map(Number);
+      S.strobe.onMs = on;
+      S.strobe.offMs = off;
+      $('#onMs').value = on;
+      $('#offMs').value = off;
+      $('#onMsVal').textContent = on + ' ms';
+      $('#offMsVal').textContent = off + ' ms';
+      updateStrobeFreq();
+    };
+  });
+  $('#btnStartStrobe').onclick = () => {
+    if (S.strobe.on) {
+      stopStrobe();
+      exitLightMode();
+    } else {
+      startStrobe();
+    }
+  };
+  
+  // Sound
+  $('#btnTestMic').onclick = async () => {
+    if (S.sound.ctx) {
+      toast('🎤 Mic already active');
+    } else {
+      await enableMic();
+    }
+  };
+  $('#threshold').oninput = e => {
+    S.sound.threshold = +e.target.value / 100;
+    $('#thresholdVal').textContent = e.target.value + '%';
+    $('#meterThresh').style.left = e.target.value + '%';
+  };
+  $('#flashMs').oninput = e => {
+    S.sound.flashMs = +e.target.value;
+    $('#flashMsVal').textContent = e.target.value + ' ms';
+  };
+  $('#btnStartSound').onclick = () => {
+    if (S.sound.on) {
+      stopSoundMode();
+      exitLightMode();
+    } else {
+      startSoundMode();
+    }
+  };
+  $('#micSelect').onchange = async e => {
+    if (!e.target.value) return;
+    // restart with new device
+    if (S.sound.stream) {
+      S.sound.stream.getTracks().forEach(t => t.stop());
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { exact: e.target.value } }
+      });
+      const src = S.sound.ctx.createMediaStreamSource(stream);
+      const analyser = S.sound.ctx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.6;
+      src.connect(analyser);
+      S.sound.stream = stream;
+      S.sound.analyser = analyser;
+      toast('🎤 Mic switched');
+    } catch(err) { toast('❌ ' + err.message); }
+  };
+  
+  // Pattern grid
+  const grid = $('#patternGrid');
+  Object.entries(PATTERNS).forEach(([key, p]) => {
+    const btn = document.createElement('button');
+    btn.className = 'pattern-btn';
+    btn.dataset.pattern = key;
+    btn.innerHTML = `<span class="emoji">${p.emoji}</span><span>${p.name}</span>`;
+    btn.onclick = () => {
+      if (S.pattern.on && S.pattern.name === key) {
+        stopPattern();
+        exitLightMode();
+      } else {
+        startPattern(key);
+      }
+    };
+    grid.appendChild(btn);
+  });
+  
+  // Pattern speed
+  $('#patternSpeed').oninput = e => {
+    S.pattern.speed = +e.target.value / 100;
+    $('#speedVal').textContent = S.pattern.speed.toFixed(1) + 'x';
+  };
+  
+  // Tools
+  $('#swWake').onclick = toggleWakeLock;
+  $('#swVibrate').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.settings.vibration = e.currentTarget.classList.contains('on');
+  };
+  $('#swCountdown').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.settings.countdown = e.currentTarget.classList.contains('on');
+  };
+  $('#autoStop').oninput = e => {
+    const v = +e.target.value;
+    $('#autoStopVal').textContent = v === 0 ? 'Off' : v + 's';
+    if (S.light.activeMode) setAutoStop(v);
+  };
+  $('#btnSavePreset').onclick = savePreset;
+  $('#btnLoadPreset').onclick = loadPreset;
+  $('#btnExport').onclick = exportSettings;
+  $('#btnImport').onclick = importSettings;
+  
+  // Floating stop
+  $('#btnStopLight').onclick = exitLightMode;
+  
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input, select, textarea')) return;
+    switch(e.key.toLowerCase()) {
+      case ' ':
+        e.preventDefault();
+        toggleManualLight();
+        break;
+      case 'f': toggleFullscreen(); break;
+      case 's':
+        if (S.strobe.on) { stopStrobe(); exitLightMode(); }
+        else startStrobe();
+        break;
+      case 'escape': exitLightMode(); break;
+      case 't': toggleTheme(); break;
+      case '1': $$('.tab')[0].click(); break;
+      case '2': $$('.tab')[1].click(); break;
+      case '3': $$('.tab')[2].click(); break;
+      case '4': $$('.tab')[3].click(); break;
+      case '5': $$('.tab')[4].click(); break;
+      case '6': $$('.tab')[5].click(); break;
+    }
+  });
+  
+  // Fullscreen button state
+  document.addEventListener('fullscreenchange', () => {
+    $('#btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
+  });
+}
+
+function updateAllUI() {
+  updateTorchButton();
+  updateStrobeButton();
+  updatePatternUI();
+  $('#btnStartSound').textContent = S.sound.on ? '⏹ STOP SOUND MODE' : '🔊 ACTIVATE SOUND LIGHT';
+  $('#btnStartSound').classList.toggle('btn-primary', !S.sound.on);
+  $('#btnStartSound').classList.toggle('btn-danger', S.sound.on);
+}
+
+// ============================================
+// INIT
+// ============================================
+async function init() {
+  bindUI();
+  initBattery();
+  updateStrobeFreq();
+  updateStatsUI();
+  
+  // Restore theme
+  if (localStorage.getItem('flashmaster_theme') === 'light') {
+    document.body.dataset.theme = 'light';
+    $('#btnTheme').textContent = '☀️';
+  }
+  
+  // Try torch init on first user gesture (better on mobile)
+  const initTorchOnce = () => {
+    initTorch();
+    document.removeEventListener('click', initTorchOnce);
+    document.removeEventListener('touchstart', initTorchOnce);
+  };
+  document.addEventListener('click', initTorchOnce, { once: true });
+  document.addEventListener('touchstart', initTorchOnce, { once: true });
+  
+  // Also try immediately
+  initTorch().catch(() => {});
+  
+  toast('⚡ FlashMaster Pro ready');
+}
+
+// Save theme on change
+const origToggleTheme = toggleTheme;
+document.addEventListener('click', e => {
+  if (e.target.id === 'btnTheme' || e.target.closest('#btnTheme')) {
+    setTimeout(() => {
+      localStorage.setItem('flashmaster_theme', document.body.dataset.theme);
+    }, 50);
+  }
+});
+
+// Handle page visibility (release wake lock when hidden)
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden) {
+    // pause expensive loops
+  } else {
+    // resume
+    if (S.sound.analyser && !S.sound.raf) startSoundLoop();
+  }
+});
+
+// Cleanup
+window.addEventListener('beforeunload', () => {
+  if (S.torch.stream) S.torch.stream.getTracks().forEach(t => t.stop());
+  if (S.sound.stream) S.sound.stream.getTracks().forEach(t => t.stop());
+  if (S.wake) S.wake.release();
+});
+
+// Start
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+  </html>
