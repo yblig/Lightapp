@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#0a0e17">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voice Trigger Pro</title>
+<title>MegaFun — All in One</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0a0e17;--bg-2:#0f1420;--card:#151b28;--card-2:#1c2434;
   --border:#252e40;--text:#e8ecf4;--text-dim:#7d8798;
   --accent:#22d3ee;--accent-2:#06b6d4;--danger:#ef4444;--success:#10b981;
-  --warn:#fbbf24;--radius:16px;
+  --warn:#fbbf24;--pink:#ec4899;--purple:#a855f7;--radius:16px;
 }
 [data-theme="light"]{
   --bg:#f1f5f9;--bg-2:#fff;--card:#fff;--card-2:#f8fafc;
@@ -26,23 +26,9 @@ body{
   -webkit-font-smoothing:antialiased;transition:background .3s,color .3s;
 }
 button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;touch-action:manipulation}
-input,select,textarea{font:inherit;color:inherit}
+input,select{font:inherit;color:inherit}
 
-/* === LIGHT OVERLAY === */
-.light-overlay{
-  position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;
-  z-index:9000;transition:opacity .03s linear;
-}
-
-/* === FEEDBACK PULSE === */
-.pulse-feedback{
-  position:fixed;inset:0;pointer-events:none;z-index:8500;
-  background:radial-gradient(circle,rgba(34,211,238,.35),transparent 70%);
-  opacity:0;transition:opacity .15s;
-}
-.pulse-feedback.active{opacity:1;transition:opacity .05s}
-
-/* === TOAST === */
+.light-overlay{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9000;transition:opacity .03s linear}
 .toast{
   position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120px);
   background:var(--card);border:1px solid var(--border);padding:12px 20px;
@@ -52,38 +38,31 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* === APP === */
 .app{height:100%;display:flex;flex-direction:column}
-
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
-  background:var(--bg-2);border-bottom:1px solid var(--border);
-  gap:10px;flex-shrink:0;
+  padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+  background:var(--bg-2);border-bottom:1px solid var(--border);gap:8px;flex-shrink:0;
 }
 .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .logo{
   width:40px;height:40px;border-radius:12px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  display:grid;place-items:center;font-size:20px;
-  box-shadow:0 4px 16px rgba(34,211,238,.35);
+  background:linear-gradient(135deg,var(--pink),var(--purple),var(--accent));
+  display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff;
 }
-.brand-text{min-width:0}
-.brand h1{font-size:15px;font-weight:700;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand h1{font-size:15px;font-weight:800;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand .sub{font-size:10px;color:var(--text-dim);margin-top:1px}
-.chip{
-  display:flex;align-items:center;gap:4px;padding:6px 10px;
-  background:var(--card);border:1px solid var(--border);border-radius:20px;
-  font-size:11px;font-weight:600;color:var(--text-dim);flex-shrink:0;
+.icon-btn{
+  width:38px;height:38px;border-radius:11px;background:var(--card);
+  border:1px solid var(--border);display:grid;place-items:center;font-size:16px;
+  transition:transform .15s;
 }
-.chip.active{color:var(--success);border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1)}
+.icon-btn:active{transform:scale(.92)}
 
-/* === TABS === */
 .tabs{
   display:flex;gap:4px;padding:8px 10px;background:var(--bg-2);
   border-bottom:1px solid var(--border);overflow-x:auto;
   scrollbar-width:none;flex-shrink:0;
-  -webkit-overflow-scrolling:touch;
 }
 .tabs::-webkit-scrollbar{display:none}
 .tab{
@@ -93,7 +72,6 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .tab.active{background:var(--accent);color:#0a0e17;box-shadow:0 2px 10px rgba(34,211,238,.35)}
 
-/* === CONTENT === */
 .content{
   flex:1;overflow-y:auto;padding:14px 14px calc(24px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling:touch;
@@ -113,70 +91,9 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
 
-/* === BIG LISTEN BUTTON === */
-.listen-wrap{
-  display:flex;flex-direction:column;align-items:center;
-  padding:20px 0 10px;
-}
-.listen-btn{
-  width:180px;height:180px;border-radius:50%;
-  display:grid;place-items:center;font-size:64px;
-  background:radial-gradient(circle at 30% 30%,var(--card-2),var(--card));
-  border:3px solid var(--border);
-  transition:all .3s cubic-bezier(.34,1.56,.64,1);
-  position:relative;
-}
-.listen-btn:active{transform:scale(.94)}
-.listen-btn.listening{
-  background:radial-gradient(circle at 30% 30,#67e8f9,var(--accent-2));
-  border-color:var(--accent);color:#0a0e17;
-  box-shadow:0 0 60px rgba(34,211,238,.7);
-  animation:listenPulse 1.5s ease-in-out infinite;
-}
-@keyframes listenPulse{
-  0%,100%{box-shadow:0 0 60px rgba(34,211,238,.7),inset 0 0 30px rgba(255,255,255,.2)}
-  50%{box-shadow:0 0 100px rgba(34,211,238,1),inset 0 0 40px rgba(255,255,255,.4)}
-}
-.listen-label{
-  margin-top:18px;font-size:18px;font-weight:800;letter-spacing:.3px;
-}
-.listen-sub{
-  margin-top:6px;font-size:12px;color:var(--text-dim);text-align:center;
-  padding:0 20px;line-height:1.5;
-}
-
-/* === STATUS === */
-.status-bar{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:10px 16px;background:var(--bg);border-radius:12px;
-  margin-bottom:12px;font-size:12px;font-weight:600;color:var(--text-dim);
-}
-.status-dot{
-  width:10px;height:10px;border-radius:50%;background:var(--text-dim);
-  flex-shrink:0;
-}
-.status-dot.green{background:var(--success);box-shadow:0 0 10px var(--success);animation:blink 1.5s infinite}
-.status-dot.red{background:var(--danger)}
-.status-dot.yellow{background:var(--warn);animation:blink 1s infinite}
-@keyframes blink{50%{opacity:.4}}
-
-/* === TRANSCRIPT === */
-.transcript-box{
-  background:var(--bg);border:1px solid var(--border);border-radius:12px;
-  padding:12px;min-height:60px;font-size:13px;line-height:1.5;
-  color:var(--text);word-break:break-word;margin-bottom:12px;
-}
-.transcript-box .label{
-  font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--text-dim);
-  text-transform:uppercase;margin-bottom:4px;
-}
-.transcript-box .interim{opacity:.6;font-style:italic;color:var(--text-dim)}
-.transcript-box .matched{color:var(--success);font-weight:700}
-
-/* === BUTTONS === */
 .btn{
   display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:14px 18px;border-radius:12px;font-weight:700;font-size:15px;
+  padding:13px 18px;border-radius:12px;font-weight:700;font-size:14px;
   background:var(--card-2);border:1px solid var(--border);
   transition:transform .12s;width:100%;
 }
@@ -184,44 +101,25 @@ input,select,textarea{font:inherit;color:inherit}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0a0e17;border:none;box-shadow:0 4px 20px rgba(34,211,238,.3)}
 .btn-danger{background:var(--danger);color:#fff;border:none}
 .btn-success{background:var(--success);color:#fff;border:none}
-.btn-warn{background:var(--warn);color:#0a0e17;border:none}
+.btn-pink{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none}
 .btn-sm{padding:10px 14px;font-size:13px;width:auto}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
-/* === INPUTS === */
-.input{
-  width:100%;padding:13px 14px;border-radius:11px;background:var(--bg);
-  border:1px solid var(--border);font-size:15px;color:var(--text);
-  outline:none;transition:border-color .15s;
+.power-btn{
+  width:150px;height:150px;border-radius:50%;margin:10px auto 18px;
+  display:grid;place-items:center;font-size:62px;
+  background:radial-gradient(circle at 30% 30%,var(--card-2),var(--card));
+  border:3px solid var(--border);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
 }
-.input:focus{border-color:var(--accent)}
-.input-row{display:flex;gap:8px;margin-bottom:10px}
-.input-row .input{flex:1}
-
-/* === LIST ITEMS === */
-.list-item{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:13px 14px;background:var(--bg);border-radius:11px;
-  margin-bottom:8px;gap:10px;
-}
-.list-item .main{flex:1;min-width:0}
-.list-item .title{font-size:14px;font-weight:700;word-break:break-word}
-.list-item .sub{font-size:11px;color:var(--text-dim);margin-top:2px;word-break:break-all}
-.list-item .actions{display:flex;gap:6px;flex-shrink:0}
-.mini-btn{
-  width:36px;height:36px;border-radius:9px;background:var(--card);
-  border:1px solid var(--border);display:grid;place-items:center;font-size:15px;
-  transition:transform .12s;
-}
-.mini-btn:active{transform:scale(.9)}
-.mini-btn.danger{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--danger)}
-.empty{
-  text-align:center;padding:24px 12px;color:var(--text-dim);
-  font-size:13px;line-height:1.6;
+.power-btn:active{transform:scale(.94)}
+.power-btn.on{
+  background:radial-gradient(circle at 30% 30%,#fff,var(--warn));
+  border-color:var(--warn);color:#000;
+  box-shadow:0 0 70px rgba(251,191,36,.8),inset 0 0 40px rgba(255,255,255,.4);
 }
 
-/* === SLIDERS === */
 .slider-group{margin-bottom:14px}
 .slider-label{
   display:flex;justify-content:space-between;align-items:center;
@@ -229,7 +127,7 @@ input,select,textarea{font:inherit;color:inherit}
 }
 .slider-label .val{
   color:var(--accent);font-variant-numeric:tabular-nums;
-  background:rgba(34,211,238,.1);padding:2px 10px;border-radius:8px;font-size:12px;
+  background:rgba(34,211,238,.12);padding:2px 10px;border-radius:8px;font-size:12px;
 }
 input[type="range"]{
   -webkit-appearance:none;width:100%;height:8px;border-radius:4px;
@@ -241,7 +139,17 @@ input[type="range"]::-webkit-slider-thumb{
   box-shadow:0 2px 10px rgba(34,211,238,.5);border:2px solid #fff;
 }
 
-/* === TOGGLE === */
+.color-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.color-input{
+  width:52px;height:52px;padding:0;border:none;border-radius:12px;
+  cursor:pointer;background:transparent;flex-shrink:0;
+}
+.color-input::-webkit-color-swatch-wrapper{padding:0}
+.color-input::-webkit-color-swatch{border:2px solid var(--border);border-radius:12px}
+.color-presets{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.color-preset{width:32px;height:32px;border-radius:8px;border:2px solid var(--border)}
+.color-preset:active{transform:scale(.88)}
+
 .toggle-row{
   display:flex;justify-content:space-between;align-items:center;
   padding:13px 0;border-bottom:1px solid var(--border);
@@ -261,765 +169,620 @@ input[type="range"]::-webkit-slider-thumb{
 .switch.on{background:var(--accent)}
 .switch.on::after{transform:translateX(20px)}
 
-/* === SELECT === */
-select.input{
-  appearance:none;-webkit-appearance:none;
+.meter{
+  height:16px;background:var(--bg);border-radius:8px;overflow:hidden;
+  position:relative;margin-bottom:8px;border:1px solid var(--border);
+}
+.meter-fill{
+  height:100%;width:0%;border-radius:8px;transition:width .05s linear;
+  background:linear-gradient(90deg,#10b981,#fbbf24,#ef4444);
+}
+.meter-thresh{
+  position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;
+  box-shadow:0 0 6px rgba(255,255,255,.8);border-radius:1px;
+}
+.meter-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:12px}
+#spectrum{width:100%;height:70px;border-radius:10px;background:var(--bg);margin-bottom:12px;display:block}
+
+/* GAME GRID */
+.game-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.game-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:16px 12px;text-align:center;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.game-card:active{transform:scale(.96);border-color:var(--accent)}
+.game-card .emoji{font-size:32px;display:block;margin-bottom:6px}
+.game-card .name{font-size:12px;font-weight:700;line-height:1.3}
+.game-card .meta{font-size:10px;color:var(--text-dim);margin-top:3px}
+.game-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--pink),var(--purple),var(--accent));
+  opacity:.6;
+}
+
+/* GAME MODAL */
+.game-modal{
+  position:fixed;inset:0;background:var(--bg);z-index:10000;
+  display:flex;flex-direction:column;
+  animation:slideUp .3s ease;
+}
+.game-modal.hidden{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.game-header{
+  display:flex;align-items:center;gap:10px;padding:14px 14px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  background:var(--bg-2);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.game-header h2{font-size:16px;font-weight:800;flex:1;text-align:center}
+.game-body{
+  flex:1;overflow-y:auto;padding:16px;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling:touch;
+}
+
+/* COMMON GAME UI */
+.game-controls{display:flex;gap:8px;margin-bottom:14px;justify-content:center;flex-wrap:wrap}
+.game-controls .btn{width:auto;padding:10px 18px;font-size:13px}
+.game-status{
+  text-align:center;font-size:16px;font-weight:700;
+  padding:12px;color:var(--accent);min-height:48px;
+}
+.game-status.win{color:var(--success);animation:pop .4s}
+.game-status.lose{color:var(--danger)}
+@keyframes pop{50%{transform:scale(1.15)}}
+
+/* TICTACTOE */
+.ttt-board{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;max-width:340px;margin:0 auto;
+}
+.ttt-cell{
+  aspect-ratio:1;border-radius:14px;background:var(--card);
+  border:2px solid var(--border);font-size:56px;font-weight:800;
+  display:grid;place-items:center;transition:all .15s;
+  color:var(--text);
+}
+.ttt-cell:active{transform:scale(.94)}
+.ttt-cell.x{color:var(--pink)}
+.ttt-cell.o{color:var(--accent)}
+.ttt-cell.win{background:rgba(16,185,129,.2);border-color:var(--success);animation:pop .4s}
+
+/* CONNECT FOUR */
+.c4-board{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:4px;max-width:380px;margin:0 auto;background:var(--card-2);
+  padding:8px;border-radius:14px;
+}
+.c4-cell{
+  aspect-ratio:1;border-radius:50%;background:var(--bg);
+  transition:all .2s;border:2px solid var(--border);
+}
+.c4-cell.p1{background:var(--pink);border-color:var(--pink);animation:drop .3s}
+.c4-cell.p2{background:var(--warn);border-color:var(--warn);animation:drop .3s}
+.c4-col-btn{
+  aspect-ratio:2/1;background:transparent;border-radius:8px;
+}
+.c4-col-btn:active{background:rgba(34,211,238,.15)}
+@keyframes drop{from{transform:translateY(-30px);opacity:.3}to{transform:none;opacity:1}}
+
+/* RPS */
+.rps-choice{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-width:340px;margin:0 auto 16px;
+}
+.rps-btn{
+  aspect-ratio:1;border-radius:14px;background:var(--card);
+  border:2px solid var(--border);font-size:44px;
+  display:grid;place-items:center;
+}
+.rps-btn:active{transform:scale(.92);border-color:var(--accent)}
+.rps-btn.selected{background:rgba(34,211,238,.2);border-color:var(--accent)}
+.rps-vs{display:flex;justify-content:center;gap:20px;font-size:60px;margin:14px 0}
+.rps-vs .hand{transition:all .2s}
+.rps-vs .hand.reveal{animation:pop .3s}
+
+/* MEMORY MATCH */
+.memory-board{
+  display:grid;gap:8px;max-width:400px;margin:0 auto;
+}
+.memory-cell{
+  aspect-ratio:1;border-radius:12px;
+  background:var(--card);border:2px solid var(--border);
+  font-size:34px;display:grid;place-items:center;
+  transition:all .3s;cursor:pointer;position:relative;
+}
+.memory-cell::before{
+  content:'?';position:absolute;inset:0;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  border-radius:10px;font-weight:800;font-size:28px;color:#fff;
+  transition:opacity .2s;
+}
+.memory-cell.flipped::before{opacity:0}
+.memory-cell.matched{opacity:.5;pointer-events:none;background:rgba(16,185,129,.2);border-color:var(--success)}
+.memory-cell.matched::before{display:none}
+
+/* REACTION */
+.reaction-area{
+  height:280px;border-radius:16px;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;font-size:22px;font-weight:800;text-align:center;
+  background:var(--card);border:2px solid var(--border);transition:all .1s;
+  cursor:pointer;user-select:none;
+}
+.reaction-area.red{background:var(--danger);color:#fff}
+.reaction-area.green{background:var(--success);color:#fff;animation:pulseGreen .5s infinite}
+
+/* WHACK */
+.whack-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  max-width:340px;margin:0 auto;
+}
+.whack-cell{
+  aspect-ratio:1;border-radius:14px;background:var(--card);
+  border:2px solid var(--border);font-size:48px;
+  display:grid;place-items:center;transition:all .15s;
+  cursor:pointer;
+}
+.whack-cell.active{background:radial-gradient(circle,#fde68a,var(--warn));border-color:var(--warn)}
+
+/* 2048 */
+.g2048-board{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  max-width:340px;margin:0 auto;background:var(--card-2);
+  padding:8px;border-radius:14px;
+}
+.g2048-cell{
+  aspect-ratio:1;border-radius:10px;background:var(--bg);
+  display:grid;place-items:center;font-size:20px;font-weight:800;
+  color:var(--text);transition:all .15s;
+}
+.g2048-cell[data-v="2"]{background:#eee4da;color:#776e65}
+.g2048-cell[data-v="4"]{background:#ede0c8;color:#776e65}
+.g2048-cell[data-v="8"]{background:#f2b179;color:#fff}
+.g2048-cell[data-v="16"]{background:#f59563;color:#fff}
+.g2048-cell[data-v="32"]{background:#f67c5f;color:#fff}
+.g2048-cell[data-v="64"]{background:#f65e3b;color:#fff}
+.g2048-cell[data-v="128"]{background:#edcf72;color:#fff;font-size:16px}
+.g2048-cell[data-v="256"]{background:#edcc61;color:#fff;font-size:16px}
+.g2048-cell[data-v="512"]{background:#edc850;color:#fff;font-size:16px}
+.g2048-cell[data-v="1024"]{background:#edc53f;color:#fff;font-size:13px}
+.g2048-cell[data-v="2048"]{background:#edc22e;color:#fff;font-size:13px}
+
+/* SLIDING PUZZLE */
+.slide-board{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  max-width:340px;margin:0 auto;background:var(--card-2);
+  padding:8px;border-radius:14px;
+}
+.slide-cell{
+  aspect-ratio:1;border-radius:10px;font-size:32px;font-weight:800;
+  background:var(--card);border:2px solid var(--border);
+  display:grid;place-items:center;transition:all .15s;
+  color:var(--text);
+}
+.slide-cell.empty{background:transparent;border-color:transparent}
+
+/* SIMON */
+.simon-board{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  max-width:300px;margin:0 auto;aspect-ratio:1;
+}
+.simon-btn{
+  border-radius:16px;border:3px solid var(--border);
+  transition:all .1s;cursor:pointer;
+}
+.simon-btn[data-c="0"]{background:#ef4444}
+.simon-btn[data-c="1"]{background:#10b981}
+.simon-btn[data-c="2"]{background:#fbbf24}
+.simon-btn[data-c="3"]{background:#3b82f6}
+.simon-btn.flash{filter:brightness(2);box-shadow:0 0 40px currentColor;transform:scale(1.05)}
+
+/* LIGHTS OUT */
+.lo-board{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:6px;
+  max-width:320px;margin:0 auto;
+}
+.lo-cell{
+  aspect-ratio:1;border-radius:8px;background:var(--card);
+  border:2px solid var(--border);transition:all .15s;
+}
+.lo-cell.on{background:var(--warn);box-shadow:0 0 20px var(--warn);border-color:var(--warn)}
+
+/* MATH BATTLE */
+.math-problem{
+  font-size:44px;font-weight:800;text-align:center;
+  color:var(--accent);margin:20px 0;font-variant-numeric:tabular-nums;
+}
+.math-input-row{
+  display:flex;gap:8px;max-width:340px;margin:0 auto;
+}
+.math-input-row input{
+  flex:1;padding:14px;border-radius:12px;background:var(--bg);
+  border:2px solid var(--border);font-size:24px;text-align:center;
+  font-weight:800;color:var(--text);outline:none;
+}
+.math-input-row input:focus{border-color:var(--accent)}
+.math-players{
+  display:flex;gap:10px;margin-bottom:14px;
+}
+.math-player{
+  flex:1;background:var(--card);border:2px solid var(--border);
+  border-radius:12px;padding:12px;text-align:center;transition:all .2s;
+}
+.math-player.active{border-color:var(--accent);background:rgba(34,211,238,.1)}
+.math-player .name{font-size:12px;font-weight:700;color:var(--text-dim)}
+.math-player .score{font-size:24px;font-weight:800;color:var(--accent)}
+
+/* GUESS NUMBER */
+.guess-log{
+  max-height:200px;overflow-y:auto;background:var(--bg);
+  border-radius:12px;padding:12px;margin-bottom:12px;
+  font-size:13px;line-height:1.8;
+}
+.guess-log .item{padding:4px 0;border-bottom:1px solid var(--border)}
+.guess-log .item:last-child{border-bottom:none}
+.guess-log .high{color:var(--danger)}
+.guess-log .low{color:var(--info, #3b82f6)}
+.guess-log .correct{color:var(--success);font-weight:700}
+
+.input{
+  width:100%;padding:13px 14px;border-radius:11px;background:var(--bg);
+  border:1px solid var(--border);font-size:15px;color:var(--text);
+  outline:none;transition:border-color .15s;
+}
+.input:focus{border-color:var(--accent)}
+select.input{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237d8798' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;
-  padding-right:38px;
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
 }
 
-/* === COLOR === */
-.color-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.color-input{
-  width:52px;height:52px;padding:0;border:none;border-radius:12px;
-  cursor:pointer;background:transparent;flex-shrink:0;
+.list-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 14px;background:var(--bg);border-radius:11px;
+  margin-bottom:8px;gap:10px;
 }
-.color-input::-webkit-color-swatch-wrapper{padding:0}
-.color-input::-webkit-color-swatch{border:2px solid var(--border);border-radius:12px}
-.color-presets{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.color-preset{
-  width:32px;height:32px;border-radius:8px;border:2px solid var(--border);
+.mini-btn{
+  width:36px;height:36px;border-radius:9px;background:var(--card);
+  border:1px solid var(--border);display:grid;place-items:center;font-size:15px;
 }
-.color-preset:active{transform:scale(.88)}
-
-/* === STATS === */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{
-  background:var(--bg);border-radius:11px;padding:13px;text-align:center;
-  border:1px solid var(--border);
-}
-.stat .num{font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
-.stat .lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700}
-
-/* === QUICK CHIPS === */
-.quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.quick-chip{
-  padding:8px 14px;background:var(--card-2);border:1px solid var(--border);
-  border-radius:20px;font-size:12px;font-weight:600;
-}
-.quick-chip:active{transform:scale(.94);border-color:var(--accent)}
-
-/* === AUDIO PREVIEW === */
-.audio-info{
-  display:flex;align-items:center;gap:10px;padding:12px;
-  background:var(--bg);border-radius:11px;margin-bottom:10px;
-  border:1px solid var(--border);
-}
-.audio-icon{
-  width:40px;height:40px;border-radius:10px;background:var(--accent);
-  color:#0a0e17;display:grid;place-items:center;font-size:18px;flex-shrink:0;
-}
-.audio-info .main{flex:1;min-width:0}
-.audio-info .title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.audio-info .sub{font-size:11px;color:var(--text-dim);margin-top:2px}
-
-/* === FILE UPLOAD === */
-.file-input{display:none}
-.file-label{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:16px;border:2px dashed var(--border);border-radius:12px;
-  cursor:pointer;font-size:14px;font-weight:600;color:var(--text-dim);
-  transition:border-color .2s;text-align:center;
-}
-.file-label:active{border-color:var(--accent);color:var(--accent)}
-
-/* === HISTORY === */
-.history-item{
-  display:flex;gap:10px;padding:11px 12px;background:var(--bg);
-  border-radius:10px;margin-bottom:6px;align-items:center;
-}
-.history-item .icon{
-  width:32px;height:32px;border-radius:8px;
-  background:rgba(16,185,129,.15);color:var(--success);
-  display:grid;place-items:center;font-size:14px;flex-shrink:0;
-}
-.history-item .main{flex:1;min-width:0}
-.history-item .word{font-size:13px;font-weight:700;color:var(--success)}
-.history-item .transcript{font-size:11px;color:var(--text-dim);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.history-item .time{font-size:10px;color:var(--text-dim);flex-shrink:0}
-
-/* === MISC === */
+.mini-btn.danger{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--danger)}
+.empty{text-align:center;padding:24px 12px;color:var(--text-dim);font-size:13px;line-height:1.6}
 .hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:6px}
 .gap{height:8px}
 .hidden{display:none!important}
-.warning-box{
-  padding:12px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);
-  border-radius:11px;font-size:12px;color:var(--warn);line-height:1.5;
-  margin-bottom:12px;
-}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--bg);border-radius:11px;padding:13px;text-align:center;border:1px solid var(--border)}
+.stat .num{font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700}
 </style>
 </head>
 <body data-theme="dark">
 
 <div class="light-overlay" id="lightOverlay"></div>
-<div class="pulse-feedback" id="pulseFeedback"></div>
 <div class="toast" id="toast"></div>
 
 <div class="app">
   <header class="topbar">
     <div class="brand">
-      <div class="logo">🎙️</div>
-      <div class="brand-text">
-        <h1>Voice Trigger Pro</h1>
-        <div class="sub">Ucapkan kata → aksi otomatis</div>
+      <div class="logo">🎮</div>
+      <div>
+        <h1>MegaFun</h1>
+        <div class="sub">Lampu · Suara · 12 Game</div>
       </div>
     </div>
-    <div class="chip" id="chipBattery">🔋 --</div>
+    <button class="icon-btn" id="btnTheme">🌙</button>
+    <button class="icon-btn" id="btnFullscreen">⛶</button>
   </header>
 
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-tab="listen">🎤 Dengar</button>
-    <button class="tab" data-tab="words">📝 Kata</button>
-    <button class="tab" data-tab="action">⚡ Aksi</button>
-    <button class="tab" data-tab="history">📜 Riwayat</button>
-    <button class="tab" data-tab="settings">⚙️ Setelan</button>
+    <button class="tab active" data-tab="lampu">🔦 Lampu</button>
+    <button class="tab" data-tab="suara">🎤 Suara</button>
+    <button class="tab" data-tab="game">🎮 Game</button>
+    <button class="tab" data-tab="setelan">⚙️ Setelan</button>
   </nav>
 
   <main class="content">
 
-    <!-- ===== LISTEN TAB ===== -->
-    <section class="tab-panel active" id="tab-listen">
-      <div class="status-bar">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">Belum aktif</span>
-      </div>
-
-      <div class="listen-wrap">
-        <button class="listen-btn" id="listenBtn">🎤</button>
-        <div class="listen-label" id="listenLabel">Tekan untuk Mulai</div>
-        <div class="listen-sub" id="listenSub">Aplikasi akan mendengar kata pemicu</div>
-      </div>
-
+    <!-- ===== LAMPU ===== -->
+    <section class="tab-panel active" id="tab-lampu">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Transkrip Langsung</div>
-        <div class="transcript-box" id="transcriptBox">
-          <div class="label">Yang terdengar:</div>
-          <div id="transcriptText">— belum ada suara —</div>
-        </div>
+        <div class="card-title"><span class="dot"></span>Kontrol Lampu</div>
+        <button class="power-btn" id="powerBtn">💡</button>
         <div class="btn-row">
-          <button class="btn btn-sm" id="btnTestTrigger">🧪 Tes Pemicu</button>
-          <button class="btn btn-sm" id="btnStopAll">⏹ Stop Semua</button>
+          <button class="btn" id="btnTorch">🔦 Torch</button>
+          <button class="btn" id="btnScreen">💡 Layar</button>
+        </div>
+        <div class="hint">Tombol besar = lampu layar penuh. Torch = flash kamera (Android Chrome).</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Warna & Kecerahan</div>
+        <div class="color-row">
+          <input type="color" class="color-input" id="colorPicker" value="#ffffff">
+          <div class="color-presets" id="colorPresets"></div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Kecerahan</span><span class="val" id="brightnessVal">100%</span></div>
+          <input type="range" id="brightness" min="1" max="100" value="100">
         </div>
       </div>
-
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Kata Pemicu Aktif</div>
-        <div id="activeWordsList"><div class="empty">Belum ada kata. Tambahkan di tab "Kata".</div></div>
+        <div class="card-title"><span class="dot"></span>Strobe</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Durasi ON</span><span class="val" id="onMsVal">80 ms</span></div>
+          <input type="range" id="onMs" min="10" max="2000" value="80" step="10">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Durasi OFF</span><span class="val" id="offMsVal">120 ms</span></div>
+          <input type="range" id="offMs" min="10" max="2000" value="120" step="10">
+        </div>
+        <div class="slider-label"><span>Frekuensi</span><span class="val" id="freqVal">5.0 Hz</span></div>
+        <div class="gap"></div>
+        <button class="btn btn-primary" id="btnStrobe">💥 Mulai Strobe</button>
+        <div class="gap"></div>
+        <div class="btn-row-3">
+          <button class="btn" data-strobe="200,400">🐢 Slow</button>
+          <button class="btn" data-strobe="80,120">🚶 Medium</button>
+          <button class="btn" data-strobe="30,30">⚡ Fast</button>
+        </div>
       </div>
-
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Ringkasan</div>
-        <div class="stats-grid">
-          <div class="stat"><div class="num" id="statTriggers">0</div><div class="lbl">Total Pemicu</div></div>
-          <div class="stat"><div class="num" id="statWords">0</div><div class="lbl">Kata Aktif</div></div>
+        <div class="card-title"><span class="dot"></span>Preset Cepat</div>
+        <div class="btn-row-3">
+          <button class="btn" data-quick="#ffffff">⚪ Putih</button>
+          <button class="btn" data-quick="#ff0000">🔴 Merah</button>
+          <button class="btn" data-quick="#00ff00">🟢 Hijau</button>
+        </div>
+        <div class="gap"></div>
+        <div class="btn-row-3">
+          <button class="btn" data-quick="#0000ff">🔵 Biru</button>
+          <button class="btn" data-quick="#ffff00">🟡 Kuning</button>
+          <button class="btn" data-quick="#ff00ff">🟣 Magenta</button>
         </div>
       </div>
     </section>
 
-    <!-- ===== WORDS TAB ===== -->
-    <section class="tab-panel" id="tab-words">
+    <!-- ===== SUARA ===== -->
+    <section class="tab-panel" id="tab-suara">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Tambah Kata Pemicu</div>
-        <div class="input-row">
-          <input type="text" class="input" id="wordInput" placeholder="contoh: halo, tolong, bantuan" autocomplete="off" autocorrect="off">
+        <div class="card-title"><span class="dot"></span>Mikrofon</div>
+        <button class="btn btn-primary" id="btnMic">🎤 Aktifkan Mic</button>
+        <div class="gap"></div>
+        <div class="meter">
+          <div class="meter-fill" id="meterFill"></div>
+          <div class="meter-thresh" id="meterThresh" style="left:15%"></div>
+        </div>
+        <div class="meter-labels"><span>Hening</span><span>Keras</span></div>
+        <canvas id="spectrum"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Reaksi Suara</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Sensitivitas</span><span class="val" id="thresholdVal">8%</span></div>
+          <input type="range" id="threshold" min="1" max="80" value="8">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Durasi Reaksi</span><span class="val" id="reactDurVal">300 ms</span></div>
+          <input type="range" id="reactDur" min="50" max="3000" value="300" step="50">
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Lampu reaktif suara</div>
+            <div class="desc">Lampu nyala saat suara keras</div>
+          </div>
+          <div class="switch on" id="swReactLight"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Beep saat trigger</div>
+            <div class="desc">Bunyi "bip" elektronik (bukan TTS)</div>
+          </div>
+          <div class="switch on" id="swReactBeep"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Getar saat trigger</div>
+            <div class="desc">HP bergetar</div>
+          </div>
+          <div class="switch" id="swReactVibrate"></div>
+        </div>
+        <div class="gap"></div>
+        <button class="btn btn-primary" id="btnReactOn">🔊 Aktifkan Mode Heboh</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Kata Pemicu</div>
+        <div class="btn-row">
+          <input type="text" class="input" id="wordInput" placeholder="contoh: halo" style="padding:13px 14px">
           <button class="btn btn-primary btn-sm" id="btnAddWord" style="padding:0 20px">+</button>
         </div>
-        <div class="quick-chips">
-          <button class="quick-chip" data-quick-word="halo">+ halo</button>
-          <button class="quick-chip" data-quick-word="tolong">+ tolong</button>
-          <button class="quick-chip" data-quick-word="bantuan">+ bantuan</button>
-          <button class="quick-chip" data-quick-word="sos">+ SOS</button>
-          <button class="quick-chip" data-quick-word="buka">+ buka</button>
-          <button class="quick-chip" data-quick-word="main">+ main</button>
-        </div>
-        <div class="hint">Kata tidak peka huruf besar/kecil. Bisa tambah banyak kata.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Daftar Kata Pemicu (<span id="wordCount">0</span>)</div>
+        <div class="gap"></div>
         <div id="wordsList"><div class="empty">Belum ada kata pemicu.</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Mode Pencocokan</div>
-        <select class="input" id="matchMode">
-          <option value="contains">Mengandung kata (paling mudah)</option>
-          <option value="exact">Harus persis sama</option>
-          <option value="fuzzy">Mirip (toleran salah ucap)</option>
-        </select>
-        <div class="slider-group" id="fuzzyGroup" style="display:none;margin-top:12px">
-          <div class="slider-label"><span>Toleransi Kemiripan</span><span class="val" id="fuzzyVal">1</span></div>
-          <input type="range" id="fuzzyTolerance" min="1" max="3" value="1">
-        </div>
-        <div class="hint">"Mengandung" = paling aman. "Mirip" = kalau pengucapan agak meleset.</div>
+        <div class="hint">Ucapkan kata → lampu + beep (tanpa suara TTS). Kata tidak peka huruf besar.</div>
       </div>
     </section>
 
-    <!-- ===== ACTION TAB ===== -->
-    <section class="tab-panel" id="tab-action">
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Suara MP3</div>
-        <label class="file-label" for="audioFile">
-          🎵 Pilih / Ganti File MP3
-        </label>
-        <input type="file" class="file-input" id="audioFile" accept="audio/*">
-        <div class="gap"></div>
-        <div class="input-row">
-          <input type="url" class="input" id="audioUrl" placeholder="atau tempel URL MP3 di sini">
-          <button class="btn btn-sm" id="btnLoadUrl" style="padding:0 16px">→</button>
-        </div>
-        <div id="audioInfo" class="hidden">
-          <div class="audio-info">
-            <div class="audio-icon">🎵</div>
-            <div class="main">
-              <div class="title" id="audioName">—</div>
-              <div class="sub" id="audioSize">—</div>
-            </div>
-            <button class="mini-btn" id="btnPreviewAudio">▶</button>
-          </div>
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Volume</span><span class="val" id="volumeVal">100%</span></div>
-          <input type="range" id="volume" min="0" max="100" value="100">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Ulangi Suara</span><span class="val" id="repeatVal">1x</span></div>
-          <input type="range" id="repeat" min="1" max="10" value="1">
-        </div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Mainkan MP3 saat kata terdeteksi</div>
-            <div class="desc">Suara otomatis diputar</div>
-          </div>
-          <div class="switch on" id="swAudioOn"></div>
-        </div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Pause mic saat audio main</div>
-            <div class="desc">Hindari audio menangkap suaranya sendiri</div>
-          </div>
-          <div class="switch on" id="swPauseMic"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Flash / Lampu</div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Nyalakan lampu saat terdeteksi</div>
-            <div class="desc">Aktifkan flash otomatis</div>
-          </div>
-          <div class="switch on" id="swLightOn"></div>
-        </div>
-        <div class="gap"></div>
-        <div class="card-title" style="margin-top:8px">Mode Flash</div>
-        <select class="input" id="flashMode">
-          <option value="torch">🔦 Torch (kamera flash)</option>
-          <option value="screen" selected>💡 Layar putih</option>
-          <option value="strobe">💥 Strobe (kedip)</option>
-          <option value="both">🔦💡 Torch + Layar</option>
-        </select>
-        <div class="gap"></div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Durasi Flash</span><span class="val" id="flashDurVal">1.5 detik</span></div>
-          <input type="range" id="flashDur" min="200" max="10000" value="1500" step="100">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Kecepatan Strobe</span><span class="val" id="strobeSpeedVal">Sedang</span></div>
-          <input type="range" id="strobeSpeed" min="1" max="10" value="5">
-        </div>
-        <div class="color-row">
-          <input type="color" class="color-input" id="flashColor" value="#ffffff">
-          <div class="color-presets" id="flashColorPresets"></div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-sm" id="btnTestLight">🔦 Tes Lampu</button>
-          <button class="btn btn-sm" id="btnStopLight">⏹ Stop</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Getar & Suara Balasan</div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Getar saat terdeteksi</div>
-            <div class="desc">HP bergetar tanda kata tertangkap</div>
-          </div>
-          <div class="switch on" id="swVibrate"></div>
-        </div>
-        <div class="toggle-row">
-          <div>
-            <div class="label">Suara balasan (TTS)</div>
-            <div class="desc">HP mengucapkan kata yang terdeteksi</div>
-          </div>
-          <div class="switch" id="swTts"></div>
-        </div>
-      </div>
+    <!-- ===== GAME ===== -->
+    <section class="tab-panel" id="tab-game">
+      <div class="game-grid" id="gameGrid"></div>
     </section>
 
-    <!-- ===== HISTORY TAB ===== -->
-    <section class="tab-panel" id="tab-history">
+    <!-- ===== SETELAN ===== -->
+    <section class="tab-panel" id="tab-setelan">
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Statistik</div>
-        <div class="stats-grid">
-          <div class="stat"><div class="num" id="hTotal">0</div><div class="lbl">Total Pemicu</div></div>
-          <div class="stat"><div class="num" id="hToday">0</div><div class="lbl">Hari Ini</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Riwayat Terakhir</div>
-        <div id="historyList"><div class="empty">Belum ada riwayat. Coba pemicu dulu.</div></div>
-        <div class="gap"></div>
-        <div class="btn-row">
-          <button class="btn btn-sm" id="btnExportHistory">📤 Ekspor</button>
-          <button class="btn btn-sm btn-danger" id="btnClearHistory">🗑 Hapus</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== SETTINGS TAB ===== -->
-    <section class="tab-panel" id="tab-settings">
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Bahasa Pengenalan</div>
-        <select class="input" id="langSelect">
-          <option value="id-ID">🇮🇩 Bahasa Indonesia</option>
-          <option value="en-US">🇺🇸 English (US)</option>
-          <option value="en-GB">🇬🇧 English (UK)</option>
-          <option value="ms-MY">🇲🇾 Bahasa Melayu</option>
-          <option value="zh-CN">🇨🇳 中文</option>
-          <option value="ja-JP">🇯🇵 日本語</option>
-        </select>
-        <div class="hint">Ganti bahasa jika kata pemicu dalam bahasa lain.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Perilaku</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Jeda antar pemicu</span><span class="val" id="cooldownVal">3 detik</span></div>
-          <input type="range" id="cooldown" min="0" max="30" value="3">
-        </div>
+        <div class="card-title"><span class="dot"></span>Umum</div>
         <div class="toggle-row">
           <div>
-            <div class="label">Tetap menyala (Wake Lock)</div>
-            <div class="desc">Cegah layar tidur selama mendengar</div>
+            <div class="label">Layar tetap menyala</div>
+            <div class="desc">Wake Lock — cegah HP tidur</div>
           </div>
           <div class="switch" id="swWake"></div>
         </div>
         <div class="toggle-row">
           <div>
-            <div class="label">Lanjutkan otomatis</div>
-            <div class="desc">Dengar lagi setelah audio/main flash</div>
+            <div class="label">Getar</div>
+            <div class="desc">Aktifkan feedback haptic</div>
           </div>
-          <div class="switch on" id="swContinuous"></div>
+          <div class="switch on" id="swVibrate"></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Mode terang</div>
+            <div class="desc">Ganti tema gelap/terang</div>
+          </div>
+          <div class="switch" id="swLightTheme"></div>
         </div>
       </div>
-
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Simpan & Backup</div>
-        <div class="btn-row">
-          <button class="btn btn-sm" id="btnSaveAll">💾 Simpan Semua</button>
-          <button class="btn btn-sm" id="btnLoadAll">📂 Muat</button>
-        </div>
-        <div class="gap"></div>
-        <div class="btn-row">
-          <button class="btn btn-sm" id="btnExportAll">📤 Ekspor File</button>
-          <button class="btn btn-sm" id="btnImportAll">📥 Impor File</button>
+        <div class="card-title"><span class="dot"></span>Statistik</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="num" id="statTriggers">0</div><div class="lbl">Total Pemicu</div></div>
+          <div class="stat"><div class="num" id="statGamePlayed">0</div><div class="lbl">Game Dimainkan</div></div>
         </div>
       </div>
-
       <div class="card">
-        <div class="card-title"><span class="dot"></span>Tampilan</div>
-        <div class="btn-row">
-          <button class="btn btn-sm" id="btnTheme">🌙 Mode Gelap</button>
-          <button class="btn btn-sm btn-danger" id="btnReset">🔄 Reset Semua</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="dot"></span>Tentang Aplikasi</div>
+        <div class="card-title"><span class="dot"></span>Tentang</div>
         <p style="font-size:12px;color:var(--text-dim);line-height:1.6">
-          Voice Trigger Pro — aplikasi web yang mendengar kata pemicu melalui mikrofon HP.
-          Saat kata terdeteksi, aplikasi bisa memutar MP3, menyalakan flash, bergetar, dan lain-lain.
-          Semua data tersimpan di HP kamu, tidak ada yang dikirim ke server.
+          MegaFun — aplikasi serba ada: lampu flash & strobe, reaktif suara (beep elektronik, bukan suara robot),
+          kata pemicu, dan 12 game (2 pemain / vs bot / solo). Semua offline, data tersimpan di HP kamu.
         </p>
+        <div class="gap"></div>
+        <button class="btn btn-danger" id="btnReset">🔄 Reset Semua Data</button>
       </div>
     </section>
 
   </main>
 </div>
 
+<!-- GAME MODAL -->
+<div class="game-modal hidden" id="gameModal">
+  <div class="game-header">
+    <button class="icon-btn" id="gameClose">←</button>
+    <h2 id="gameTitle">Game</h2>
+    <button class="icon-btn" id="gameRestart">🔄</button>
+  </div>
+  <div class="game-body" id="gameBody"></div>
+</div>
+
 <script>
 (function(){
 'use strict';
 
-// ===== UTILS =====
+// ==================== UTILS ====================
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rand = n => Math.floor(Math.random() * n);
+const randInt = (a,b) => a + Math.floor(Math.random() * (b - a + 1));
 
 let toastTimer;
-function toast(msg, dur=2200) {
+function toast(msg, dur=2000) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), dur);
 }
-
 function vibrate(p) {
   if (!S.settings.vibrate) return;
   if (navigator.vibrate) navigator.vibrate(p);
 }
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-// ===== STATE =====
+// ==================== AUDIO BEEPS ====================
+let beepCtx = null;
+function getBeepCtx() {
+  if (!beepCtx) {
+    try { beepCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  if (beepCtx && beepCtx.state === 'suspended') beepCtx.resume();
+  return beepCtx;
+}
+function beep(freq = 800, dur = 150, type = 'sine', vol = 0.3) {
+  const ctx = getBeepCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur/1000);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + dur/1000);
+}
+function beepSuccess() { beep(660, 100); setTimeout(()=>beep(880, 150), 100); }
+function beepFail() { beep(300, 200, 'square'); }
+function beepClick() { beep(1200, 40, 'sine', 0.15); }
+
+// ==================== STATE ====================
 const S = {
-  words: [],           // ['halo', 'tolong']
-  audio: {
-    url: null,
-    name: '',
-    size: 0,
-    isObjectURL: false,
+  light: { on: false, color: '#ffffff', brightness: 100 },
+  strobe: { on: false, timers: [], onMs: 80, offMs: 120 },
+  torch: { track: null, stream: null, available: false },
+  sound: {
+    ctx: null, analyser: null, stream: null, raf: null,
+    level: 0, threshold: 0.08, reactDur: 300,
+    reactOn: false, flashTimer: null,
+    reactLight: true, reactBeep: true, reactVibrate: false,
   },
-  settings: {
-    lang: 'id-ID',
-    matchMode: 'contains',
-    fuzzyTolerance: 1,
-    cooldown: 3,
-    audioOn: true,
-    pauseWhilePlay: true,
-    lightOn: true,
-    flashMode: 'screen',
-    flashDuration: 1500,
-    strobeSpeed: 5,
-    flashColor: '#ffffff',
-    vibrate: true,
-    ttsOn: false,
-    wakeLock: false,
-    continuous: true,
-    volume: 1,
-    repeat: 1,
-    theme: 'dark',
-  },
-  stats: {
-    triggers: 0,
-  },
-  history: [],         // [{word, transcript, time}]
-  runtime: {
-    recognition: null,
-    listening: false,
-    lastTriggerTime: 0,
-    audioPlaying: false,
-    flashTimers: [],
-    wakeLockObj: null,
-    torch: { track: null, stream: null, available: false },
-    audioEl: null,
-  },
+  words: [],
+  recognition: null,
+  listening: false,
+  settings: { vibrate: true, theme: 'dark', wakeLock: false },
+  stats: { triggers: 0, gamesPlayed: 0 },
+  wakeObj: null,
 };
 
-// ===== PERSISTENCE =====
-const STORE_KEY = 'voicetrigger_v1';
+const STORE = 'megafun_v1';
 function saveState() {
   try {
-    const toSave = {
+    localStorage.setItem(STORE, JSON.stringify({
       words: S.words,
       settings: S.settings,
       stats: S.stats,
-      history: S.history.slice(0, 100),
-    };
-    localStorage.setItem(STORE_KEY, JSON.stringify(toSave));
+      brightness: S.light.brightness,
+      color: S.light.color,
+    }));
   } catch(e) {}
 }
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
+    const d = JSON.parse(localStorage.getItem(STORE) || '{}');
     if (Array.isArray(d.words)) S.words = d.words;
     if (d.settings) S.settings = { ...S.settings, ...d.settings };
     if (d.stats) S.stats = { ...S.stats, ...d.stats };
-    if (Array.isArray(d.history)) S.history = d.history;
+    if (d.brightness) S.light.brightness = d.brightness;
+    if (d.color) S.light.color = d.color;
   } catch(e) {}
 }
 
-// ===== SPEECH RECOGNITION =====
-function getSpeechRecognition() {
-  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+// ==================== LIGHT ====================
+const overlay = $('#lightOverlay');
+function paintLight() {
+  overlay.style.background = S.light.color;
+  overlay.style.opacity = (S.light.brightness / 100).toString();
 }
-
-function initRecognition() {
-  const SR = getSpeechRecognition();
-  if (!SR) {
-    showStatus('error', 'Browser tidak mendukung pengenalan suara');
-    return null;
-  }
-  if (S.runtime.recognition) {
-    try { S.runtime.recognition.stop(); } catch(e){}
-  }
-  const r = new SR();
-  r.lang = S.settings.lang;
-  r.continuous = true;
-  r.interimResults = true;
-  r.maxAlternatives = 3;
-
-  r.onstart = () => {
-    showStatus('listening');
-    updateListenUI(true);
-  };
-
-  r.onresult = (e) => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const res = e.results[i];
-      const transcript = (res[0].transcript || '').toLowerCase().trim();
-      if (!res.isFinal) {
-        interim += ' ' + transcript;
-        showTranscript(transcript, false);
-      } else {
-        showTranscript(transcript, true);
-        if (!S.runtime.audioPlaying || !S.settings.pauseWhilePlay) {
-          checkTriggers(transcript, res);
-        }
-      }
-    }
-  };
-
-  r.onerror = (e) => {
-    const err = e.error;
-    if (err === 'no-speech' || err === 'aborted') return;
-    if (err === 'not-allowed' || err === 'service-not-allowed') {
-      showStatus('error', 'Izin mikrofon ditolak');
-      S.runtime.listening = false;
-      updateListenUI(false);
-    } else if (err === 'network') {
-      showStatus('error', 'Koneksi bermasalah');
-    } else {
-      showStatus('error', 'Error: ' + err);
-    }
-  };
-
-  r.onend = () => {
-    if (S.runtime.listening) {
-      // auto-restart
-      setTimeout(() => {
-        if (S.runtime.listening) {
-          try { r.start(); } catch(e){}
-        }
-      }, 300);
-    } else {
-      updateListenUI(false);
-      if (!S.runtime.listening) showStatus('idle');
-    }
-  };
-
-  return r;
+function setScreenLight(on) {
+  if (on) { paintLight(); overlay.style.opacity = S.light.brightness / 100; S.light.on = true; }
+  else { overlay.style.opacity = '0'; S.light.on = false; }
 }
-
-function startListening() {
-  const SR = getSpeechRecognition();
-  if (!SR) {
-    toast('❌ Browser tidak mendukung. Pakai Chrome Android.');
-    return;
-  }
-  if (S.runtime.listening) return;
-  if (!S.words.length) {
-    toast('📝 Tambah kata pemicu dulu di tab Kata');
-    return;
-  }
-  S.runtime.recognition = initRecognition();
-  if (!S.runtime.recognition) return;
-  S.runtime.listening = true;
+function toggleManualLight() {
+  setScreenLight(!S.light.on);
+  vibrate(20);
+  if (S.light.on) beepClick();
+}
+async function setTorch(on) {
+  if (!S.torch.track) return false;
   try {
-    S.runtime.recognition.start();
-    vibrate(30);
-    if (S.settings.wakeLock) requestWakeLock();
-  } catch(e) {
-    toast('❌ Gagal: ' + e.message);
-    S.runtime.listening = false;
-    updateListenUI(false);
-  }
+    await S.torch.track.applyConstraints({ advanced: [{ torch: on }] });
+    return true;
+  } catch(e) { return false; }
 }
-
-function stopListening() {
-  S.runtime.listening = false;
-  if (S.runtime.recognition) {
-    try { S.runtime.recognition.stop(); } catch(e){}
-  }
-  releaseWakeLock();
-  showStatus('idle');
-  updateListenUI(false);
-}
-
-// ===== WORD MATCHING =====
-function checkTriggers(transcript, resultEvent) {
-  if (!transcript) return;
-  const now = Date.now();
-  if (now - S.runtime.lastTriggerTime < S.settings.cooldown * 1000) return;
-
-  for (const word of S.words) {
-    if (matches(transcript, word)) {
-      S.runtime.lastTriggerTime = now;
-      fireTrigger(word, transcript);
-      return;
-    }
-  }
-}
-
-function matches(text, word) {
-  const t = text.toLowerCase();
-  const w = word.toLowerCase();
-  const mode = S.settings.matchMode;
-  if (mode === 'exact') return t === w;
-  if (mode === 'contains') return t.includes(w) || w.includes(t);
-  if (mode === 'fuzzy') {
-    if (t.includes(w)) return true;
-    const tokens = t.split(/\s+/).filter(Boolean);
-    return tokens.some(tok => levenshtein(tok, w) <= S.settings.fuzzyTolerance);
-  }
-  return false;
-}
-
-function levenshtein(a, b) {
-  if (a.length < b.length) [a,b] = [b,a];
-  const m = a.length, n = b.length;
-  if (n === 0) return m;
-  const dp = new Array(n + 1);
-  for (let j = 0; j <= n; j++) dp[j] = j;
-  for (let i = 1; i <= m; i++) {
-    let prev = dp[0];
-    dp[0] = i;
-    for (let j = 1; j <= n; j++) {
-      const tmp = dp[j];
-      dp[j] = a[i-1] === b[j-1] ? prev : 1 + Math.min(dp[j], dp[j-1], prev);
-      prev = tmp;
-    }
-  }
-  return dp[n];
-}
-
-// ===== TRIGGER ACTIONS =====
-async function fireTrigger(word, transcript) {
-  // Update stats & history
-  S.stats.triggers++;
-  S.history.unshift({
-    word: word,
-    transcript: transcript,
-    time: Date.now(),
-  });
-  if (S.history.length > 200) S.history = S.history.slice(0, 200);
-  saveState();
-  updateStatsUI();
-  updateHistoryUI();
-  updateActiveWordsUI();
-
-  // Visual feedback
-  pulseFeedback();
-  vibrate([60, 40, 60, 40, 60]);
-
-  // Pause mic while audio plays
-  const shouldPauseMic = S.settings.audioOn && S.audio.url && S.settings.pauseWhilePlay;
-  if (shouldPauseMic && S.runtime.recognition) {
-    try { S.runtime.recognition.stop(); } catch(e){}
-  }
-
-  // Actions in parallel where possible
-  const tasks = [];
-
-  if (S.settings.audioOn && S.audio.url) {
-    tasks.push(playAudio());
-  }
-
-  if (S.settings.lightOn) {
-    tasks.push(doFlash());
-  }
-
-  if (S.settings.ttsOn) {
-    speakText(word);
-  }
-
-  await Promise.allSettled(tasks);
-
-  // Restart listening if needed
-  if (shouldPauseMic && S.runtime.listening) {
-    setTimeout(() => {
-      if (S.runtime.listening && S.runtime.recognition) {
-        try { S.runtime.recognition.start(); } catch(e){}
-      }
-    }, 300);
-  }
-}
-
-function pulseFeedback() {
-  const el = $('#pulseFeedback');
-  el.classList.add('active');
-  setTimeout(() => el.classList.remove('active'), 250);
-}
-
-// ===== AUDIO =====
-function getAudioEl() {
-  if (!S.runtime.audioEl) {
-    S.runtime.audioEl = new Audio();
-    S.runtime.audioEl.addEventListener('ended', () => {
-      S.runtime.audioPlaying = false;
-    });
-  }
-  return S.runtime.audioEl;
-}
-
-async function playAudio() {
-  if (!S.audio.url) return;
-  const el = getAudioEl();
-  el.src = S.audio.url;
-  el.volume = S.settings.volume;
-  el.currentTime = 0;
-  S.runtime.audioPlaying = true;
-  const repeat = Math.max(1, S.settings.repeat);
-  try {
-    for (let i = 0; i < repeat; i++) {
-      el.currentTime = 0;
-      await el.play().catch(err => console.warn('Play err:', err.message));
-      // wait for ended
-      await new Promise(resolve => {
-        const onEnd = () => { el.removeEventListener('ended', onEnd); resolve(); };
-        el.addEventListener('ended', onEnd);
-        setTimeout(() => { el.removeEventListener('ended', onEnd); resolve(); }, 30000);
-      });
-    }
-  } finally {
-    S.runtime.audioPlaying = false;
-  }
-}
-
-function setAudioFromFile(file) {
-  if (!file) return;
-  if (S.audio.isObjectURL && S.audio.url) {
-    URL.revokeObjectURL(S.audio.url);
-  }
-  const url = URL.createObjectURL(file);
-  S.audio.url = url;
-  S.audio.name = file.name;
-  S.audio.size = file.size;
-  S.audio.isObjectURL = true;
-  saveState();
-  updateAudioUI();
-  toast('🎵 MP3 dimuat: ' + file.name);
-}
-
-function setAudioFromUrl(url) {
-  if (!url) return;
-  if (S.audio.isObjectURL && S.audio.url) {
-    URL.revokeObjectURL(S.audio.url);
-  }
-  S.audio.url = url;
-  S.audio.name = 'URL eksternal';
-  S.audio.size = 0;
-  S.audio.isObjectURL = false;
-  saveState();
-  updateAudioUI();
-  toast('🎵 URL dimuat');
-}
-
-// ===== LIGHT / FLASH =====
 async function initTorch() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -1027,220 +790,230 @@ async function initTorch() {
     });
     const track = stream.getVideoTracks()[0];
     const caps = track.getCapabilities ? track.getCapabilities() : {};
-    S.runtime.torch.stream = stream;
-    S.runtime.torch.track = track;
-    S.runtime.torch.available = !!caps.torch;
-    if (!S.runtime.torch.available) {
-      stream.getTracks().forEach(t => t.stop());
-      S.runtime.torch.stream = null;
-      S.runtime.torch.track = null;
-    }
-  } catch(e) {
-    S.runtime.torch.available = false;
-  }
-}
-
-async function setTorch(on) {
-  if (!S.runtime.torch.track || !S.runtime.torch.available) return false;
-  try {
-    await S.runtime.torch.track.applyConstraints({ advanced: [{ torch: on }] });
-    return true;
-  } catch(e) { return false; }
-}
-
-function setScreenLight(on, color) {
-  const el = $('#lightOverlay');
-  el.style.background = color || S.settings.flashColor;
-  el.style.opacity = on ? '1' : '0';
-}
-
-async function doFlash() {
-  const mode = S.settings.flashMode;
-  const dur = S.settings.flashDuration;
-  const color = S.settings.flashColor;
-
-  clearFlashTimers();
-
-  if (mode === 'torch') {
-    if (S.runtime.torch.available) {
-      await setTorch(true);
-      const t = setTimeout(() => setTorch(false), dur);
-      S.runtime.flashTimers.push(t);
+    if (caps.torch) {
+      S.torch.track = track;
+      S.torch.stream = stream;
+      S.torch.available = true;
+      $('#btnTorch').textContent = '🔦 Torch ✓';
     } else {
-      // fallback to screen
-      setScreenLight(true, color);
-      const t = setTimeout(() => setScreenLight(false), dur);
-      S.runtime.flashTimers.push(t);
+      stream.getTracks().forEach(t => t.stop());
+      toast('💡 Mode layar saja');
     }
-  } else if (mode === 'screen') {
-    setScreenLight(true, color);
-    const t = setTimeout(() => setScreenLight(false), dur);
-    S.runtime.flashTimers.push(t);
-  } else if (mode === 'both') {
-    setTorch(true);
-    setScreenLight(true, color);
-    const t = setTimeout(() => {
-      setTorch(false);
-      setScreenLight(false);
-    }, dur);
-    S.runtime.flashTimers.push(t);
-  } else if (mode === 'strobe') {
-    const strobeSpeed = S.settings.strobeSpeed;
-    const interval = 200 - (strobeSpeed * 15); // 5 = 125ms
-    const endTime = Date.now() + dur;
-    const doStrobeStep = () => {
-      if (Date.now() >= endTime) {
-        setScreenLight(false);
-        setTorch(false);
-        return;
-      }
-      setScreenLight(true, color);
-      setTorch(true);
-      const t1 = setTimeout(() => {
-        setScreenLight(false);
-        setTorch(false);
-        const t2 = setTimeout(doStrobeStep, interval);
-        S.runtime.flashTimers.push(t2);
-      }, interval);
-      S.runtime.flashTimers.push(t1);
-    };
-    doStrobeStep();
-  }
+  } catch(e) {}
 }
 
-function clearFlashTimers() {
-  S.runtime.flashTimers.forEach(t => clearTimeout(t));
-  S.runtime.flashTimers = [];
+// ==================== STROBE ====================
+function clearStrobe() {
+  S.strobe.timers.forEach(t => clearTimeout(t));
+  S.strobe.timers = [];
+  S.strobe.on = false;
   setScreenLight(false);
   setTorch(false);
 }
-
-// ===== TTS =====
-function speakText(text) {
-  if (!('speechSynthesis' in window)) return;
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = S.settings.lang;
-    u.rate = 1;
-    u.volume = 1;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  } catch(e) {}
+function startStrobe() {
+  clearStrobe();
+  S.strobe.on = true;
+  const cycle = () => {
+    if (!S.strobe.on) return;
+    setScreenLight(true);
+    setTorch(true);
+    const t1 = setTimeout(() => {
+      if (!S.strobe.on) return;
+      setScreenLight(false);
+      setTorch(false);
+      const t2 = setTimeout(cycle, S.strobe.offMs);
+      S.strobe.timers.push(t2);
+    }, S.strobe.onMs);
+    S.strobe.timers.push(t1);
+  };
+  cycle();
+  const btn = $('#btnStrobe');
+  btn.textContent = '⏹ Stop Strobe';
+  btn.classList.remove('btn-primary');
+  btn.classList.add('btn-danger');
+}
+function stopStrobe() {
+  clearStrobe();
+  const btn = $('#btnStrobe');
+  btn.textContent = '💥 Mulai Strobe';
+  btn.classList.remove('btn-danger');
+  btn.classList.add('btn-primary');
 }
 
-// ===== WAKE LOCK =====
-async function requestWakeLock() {
-  if (!('wakeLock' in navigator)) return;
+// ==================== SOUND ====================
+async function enableMic() {
+  if (S.sound.ctx) return true;
   try {
-    S.runtime.wakeLockObj = await navigator.wakeLock.request('screen');
-    S.runtime.wakeLockObj.addEventListener('release', () => {
-      S.runtime.wakeLockObj = null;
-    });
-  } catch(e) {}
-}
-
-function releaseWakeLock() {
-  if (S.runtime.wakeLockObj) {
-    try { S.runtime.wakeLockObj.release(); } catch(e){}
-    S.runtime.wakeLockObj = null;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.6;
+    const source = ctx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    S.sound.stream = stream;
+    S.sound.ctx = ctx;
+    S.sound.analyser = analyser;
+    startSoundLoop();
+    toast('🎤 Mic aktif');
+    return true;
+  } catch(e) {
+    toast('❌ Mic: ' + e.message);
+    return false;
   }
 }
 
-// ===== BATTERY =====
-async function initBattery() {
-  if (!('getBattery' in navigator)) return;
-  try {
-    const b = await navigator.getBattery();
-    const update = () => {
-      const lvl = Math.round(b.level * 100);
-      const icon = b.charging ? '⚡' : (lvl < 20 ? '🪫' : '🔋');
-      $('#chipBattery').textContent = icon + ' ' + lvl + '%';
-      $('#chipBattery').classList.toggle('active', b.charging);
-    };
-    update();
-    b.addEventListener('levelchange', update);
-    b.addEventListener('chargingchange', update);
-  } catch(e) {}
-}
-
-// ===== STATUS / UI UPDATES =====
-function showStatus(mode, msg) {
-  const dot = $('#statusDot');
-  const txt = $('#statusText');
-  dot.className = 'status-dot';
-  if (mode === 'listening') {
-    dot.classList.add('green');
-    txt.textContent = 'Mendengar aktif — ucapkan kata pemicu';
-  } else if (mode === 'error') {
-    dot.classList.add('red');
-    txt.textContent = msg || 'Error';
-  } else if (mode === 'processing') {
-    dot.classList.add('yellow');
-    txt.textContent = msg || 'Memproses…';
-  } else {
-    txt.textContent = msg || 'Belum aktif';
-  }
-}
-
-function updateListenUI(isListening) {
-  const btn = $('#listenBtn');
-  const label = $('#listenLabel');
-  const sub = $('#listenSub');
-  if (isListening) {
-    btn.classList.add('listening');
-    label.textContent = 'Sedang Mendengar…';
-    sub.textContent = 'Tekan lagi untuk berhenti';
-  } else {
-    btn.classList.remove('listening');
-    label.textContent = 'Tekan untuk Mulai';
-    sub.textContent = 'Aplikasi akan mendengar kata pemicu';
-  }
-}
-
-function showTranscript(text, isFinal) {
-  const el = $('#transcriptText');
-  if (isFinal) {
-    // highlight matched
-    let html = escapeHtml(text);
-    for (const w of S.words) {
-      const re = new RegExp(escapeRegex(w), 'gi');
-      html = html.replace(re, '<span class="matched">$&</span>');
+function startSoundLoop() {
+  if (!S.sound.analyser) return;
+  const dataArray = new Uint8Array(S.sound.analyser.fftSize);
+  const freqArray = new Uint8Array(S.sound.analyser.frequencyBinCount);
+  const meter = $('#meterFill');
+  const canvas = $('#spectrum');
+  const cctx = canvas.getContext('2d');
+  
+  const dpr = window.devicePixelRatio || 1;
+  const setCanvasSize = () => {
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+    cctx.scale(dpr, dpr);
+  };
+  if (canvas.width === 0) setCanvasSize();
+  
+  const loop = () => {
+    if (!S.sound.analyser) return;
+    S.sound.analyser.getByteTimeDomainData(dataArray);
+    S.sound.analyser.getByteFrequencyData(freqArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      const v = (dataArray[i] - 128) / 128;
+      sum += v * v;
     }
-    el.innerHTML = html || '—';
+    const rms = Math.min(1, Math.sqrt(sum / dataArray.length) * 2.5);
+    S.sound.level = rms;
+    meter.style.width = (rms * 100) + '%';
+    
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    cctx.clearRect(0, 0, w, h);
+    const bars = 32;
+    const step = Math.floor(freqArray.length / bars);
+    const bw = w / bars;
+    for (let i = 0; i < bars; i++) {
+      let v = 0;
+      for (let j = 0; j < step; j++) v = Math.max(v, freqArray[i*step+j]);
+      const bh = (v / 255) * h;
+      cctx.fillStyle = `hsl(${180 + i*5}, 85%, 55%)`;
+      cctx.fillRect(i * bw + 1, h - bh, bw - 2, bh);
+    }
+    
+    if (S.sound.reactOn && rms > S.sound.threshold) {
+      triggerReaction();
+    }
+    
+    S.sound.raf = requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+function triggerReaction() {
+  if (S.sound.flashTimer) clearTimeout(S.sound.flashTimer);
+  else {
+    if (S.sound.reactLight) setScreenLight(true);
+    if (S.sound.reactVibrate) vibrate(30);
+    if (S.sound.reactBeep) beep(600 + Math.random()*400, 80, 'sine', 0.25);
+    S.stats.triggers++;
+    updateStatsUI();
+    saveState();
+  }
+  S.sound.flashTimer = setTimeout(() => {
+    setScreenLight(false);
+    S.sound.flashTimer = null;
+  }, S.sound.reactDur);
+}
+
+async function startReactMode() {
+  const ok = await enableMic();
+  if (!ok) return;
+  S.sound.reactOn = !S.sound.reactOn;
+  const btn = $('#btnReactOn');
+  if (S.sound.reactOn) {
+    btn.textContent = '⏹ Stop Mode Heboh';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-danger');
+    toast('🔊 Mode heboh aktif!');
   } else {
-    el.innerHTML = '<span class="interim">' + escapeHtml(text) + '…</span>';
+    btn.textContent = '🔊 Aktifkan Mode Heboh';
+    btn.classList.remove('btn-danger');
+    btn.classList.add('btn-primary');
+    if (S.sound.flashTimer) { clearTimeout(S.sound.flashTimer); S.sound.flashTimer = null; }
+    setScreenLight(false);
   }
 }
 
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+// ==================== VOICE WORDS ====================
+function getSR() { return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
 
-function updateActiveWordsUI() {
-  const box = $('#activeWordsList');
-  if (!S.words.length) {
-    box.innerHTML = '<div class="empty">Belum ada kata. Tambahkan di tab "Kata".</div>';
-  } else {
-    box.innerHTML = S.words.map(w =>
-      `<span class="quick-chip" style="margin:2px 4px 2px 0">${escapeHtml(w)}</span>`
-    ).join('');
+function startVoiceRecognition() {
+  const SR = getSR();
+  if (!SR) {
+    toast('❌ Browser tidak mendukung (pakai Chrome Android)');
+    return;
   }
-  $('#statWords').textContent = S.words.length;
+  if (S.listening) { stopVoiceRecognition(); return; }
+  if (!S.words.length) { toast('📝 Tambah kata pemicu dulu'); return; }
+  
+  const r = new SR();
+  r.lang = 'id-ID';
+  r.continuous = true;
+  r.interimResults = false;
+  r.onresult = (e) => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (!e.results[i].isFinal) continue;
+      const text = (e.results[i][0].transcript || '').toLowerCase().trim();
+      for (const w of S.words) {
+        if (text.includes(w)) {
+          fireWordTrigger(w, text);
+          return;
+        }
+      }
+    }
+  };
+  r.onend = () => {
+    if (S.listening) setTimeout(() => { if (S.listening) try { r.start(); } catch(e){} }, 200);
+  };
+  r.onerror = (e) => {
+    if (e.error === 'no-speech' || e.error === 'aborted') return;
+    if (e.error === 'not-allowed') {
+      S.listening = false;
+      toast('❌ Izin mic ditolak');
+    }
+  };
+  S.recognition = r;
+  S.listening = true;
+  try { r.start(); toast('🎤 Dengar kata pemicu aktif'); } catch(e) {}
 }
 
-function updateStatsUI() {
-  $('#statTriggers').textContent = S.stats.triggers;
-  $('#statWords').textContent = S.words.length;
-  $('#wordCount').textContent = S.words.length;
-  $('#hTotal').textContent = S.stats.triggers;
-  const today = new Date().toDateString();
-  $('#hToday').textContent = S.history.filter(h => new Date(h.time).toDateString() === today).length;
+function stopVoiceRecognition() {
+  S.listening = false;
+  if (S.recognition) try { S.recognition.stop(); } catch(e){}
+  toast('🎤 Dengar dimatikan');
 }
 
-function updateWordsList() {
+function fireWordTrigger(word, transcript) {
+  S.stats.triggers++;
+  updateStatsUI();
+  saveState();
+  beepSuccess();
+  vibrate([60, 40, 60]);
+  // Flash
+  setScreenLight(true);
+  setTimeout(() => setScreenLight(false), 600);
+  // Vibrate pulse
+  toast(`✨ Kata terdeteksi: "${word}"`);
+}
+
+// ==================== WORDS UI ====================
+function renderWords() {
   const box = $('#wordsList');
   if (!S.words.length) {
     box.innerHTML = '<div class="empty">Belum ada kata pemicu.</div>';
@@ -1248,446 +1021,1270 @@ function updateWordsList() {
   }
   box.innerHTML = S.words.map((w, i) => `
     <div class="list-item">
-      <div class="main">
-        <div class="title">${escapeHtml(w)}</div>
-        <div class="sub">Kata pemicu #${i+1}</div>
-      </div>
-      <div class="actions">
-        <button class="mini-btn danger" data-del-word="${i}">🗑</button>
-      </div>
+      <div>${escapeHtml(w)}</div>
+      <button class="mini-btn danger" data-del-word="${i}">🗑</button>
     </div>
   `).join('');
   box.querySelectorAll('[data-del-word]').forEach(b => {
     b.onclick = () => {
-      const i = +b.dataset.delWord;
-      S.words.splice(i, 1);
-      saveState();
-      updateWordsList();
-      updateActiveWordsUI();
-      updateStatsUI();
+      S.words.splice(+b.dataset.delWord, 1);
+      renderWords(); saveState();
     };
   });
 }
 
-function updateHistoryUI() {
-  const box = $('#historyList');
-  if (!S.history.length) {
-    box.innerHTML = '<div class="empty">Belum ada riwayat. Coba pemicu dulu.</div>';
-    return;
-  }
-  box.innerHTML = S.history.slice(0, 30).map(h => {
-    const d = new Date(h.time);
-    const time = d.toLocaleString('id-ID', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short' });
-    return `
-      <div class="history-item">
-        <div class="icon">✓</div>
-        <div class="main">
-          <div class="word">${escapeHtml(h.word)}</div>
-          <div class="transcript">"${escapeHtml(h.transcript)}"</div>
+function addWord() {
+  const v = $('#wordInput').value.toLowerCase().trim();
+  if (!v) return toast('Kata kosong');
+  if (S.words.includes(v)) return toast('Sudah ada');
+  S.words.push(v);
+  $('#wordInput').value = '';
+  renderWords(); saveState();
+  toast('✓ Ditambah: ' + v);
+}
+
+// ==================== STATS ====================
+function updateStatsUI() {
+  $('#statTriggers').textContent = S.stats.triggers;
+  $('#statGamePlayed').textContent = S.stats.gamesPlayed;
+}
+
+// ==================== GAME ENGINE ====================
+const GAMES = {};
+
+function openGame(name) {
+  const g = GAMES[name];
+  if (!g) return;
+  $('#gameTitle').textContent = g.title;
+  $('#gameModal').classList.remove('hidden');
+  S.stats.gamesPlayed++;
+  updateStatsUI();
+  saveState();
+  $('#gameRestart').onclick = () => { g.render($('#gameBody')); };
+  g.render($('#gameBody'));
+}
+function closeGame() {
+  $('#gameModal').classList.add('hidden');
+  $('#gameBody').innerHTML = '';
+}
+
+// -------- 1. TIC TAC TOE --------
+GAMES.tictactoe = {
+  title: '⭕ Tic Tac Toe',
+  render(body) {
+    let board = Array(9).fill('');
+    let turn = 'X';
+    let mode = 'bot';
+    let done = false;
+    let scoreX = 0, scoreO = 0;
+    
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    const checkWin = (b) => {
+      for (const [a,c,d] of wins) if (b[a] && b[a] === b[c] && b[c] === b[d]) return { w: b[a], line: [a,c,d] };
+      if (b.every(x => x)) return { w: 'draw' };
+      return null;
+    };
+    
+    const botMove = () => {
+      const empty = board.map((c,i) => c ? -1 : i).filter(i => i >= 0);
+      if (!empty.length) return;
+      for (const i of empty) { const t = [...board]; t[i] = 'O'; if (checkWin(t)?.w === 'O') { board[i] = 'O'; return; } }
+      for (const i of empty) { const t = [...board]; t[i] = 'X'; if (checkWin(t)?.w === 'X') { board[i] = 'O'; return; } }
+      if (board[4] === '') { board[4] = 'O'; return; }
+      const corners = [0,2,6,8].filter(i => !board[i]);
+      if (corners.length) { board[corners[rand(corners.length)]] = 'O'; return; }
+      board[empty[rand(empty.length)]] = 'O';
+    };
+    
+    const draw = () => {
+      const res = checkWin(board);
+      body.innerHTML = `
+        <div class="game-controls">
+          <button class="btn ${mode==='bot'?'btn-primary':''}" data-mode="bot">🤖 vs Bot</button>
+          <button class="btn ${mode==='2p'?'btn-primary':''}" data-mode="2p">👥 2 Pemain</button>
         </div>
-        <div class="time">${time}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function updateAudioUI() {
-  const info = $('#audioInfo');
-  if (S.audio.url) {
-    info.classList.remove('hidden');
-    $('#audioName').textContent = S.audio.name;
-    $('#audioSize').textContent = S.audio.size ? formatBytes(S.audio.size) : 'URL audio';
-  } else {
-    info.classList.add('hidden');
+        <div style="text-align:center;margin-bottom:10px;font-size:13px;color:var(--text-dim)">
+          Skor: X <b style="color:var(--pink)">${scoreX}</b> · O <b style="color:var(--accent)">${scoreO}</b>
+        </div>
+        <div class="ttt-board">
+          ${board.map((c,i) => `<button class="ttt-cell ${c==='X'?'x':c==='O'?'o':''} ${res?.line?.includes(i)?'win':''}" data-i="${i}">${c}</button>`).join('')}
+        </div>
+        <div class="game-status ${res?.w==='X'||res?.w==='O'?'win':''}">
+          ${res ? (res.w === 'draw' ? '🤝 Seri!' : (res.w === 'X' ? '🎉 X Menang!' : '🎉 O Menang!')) : 'Giliran: ' + turn}
+        </div>
+        ${res ? '<button class="btn btn-primary" id="tttNew" style="margin-top:10px">Main Lagi</button>' : ''}
+      `;
+      body.querySelectorAll('[data-mode]').forEach(b => {
+        b.onclick = () => { mode = b.dataset.mode; scoreX = scoreO = 0; board = Array(9).fill(''); turn = 'X'; done = false; draw(); };
+      });
+      if (res) {
+        if (res.w === 'X') scoreX++;
+        else if (res.w === 'O') scoreO++;
+        body.querySelector('#tttNew').onclick = () => { board = Array(9).fill(''); turn = 'X'; done = false; draw(); };
+        if (!done) { done = true; beepSuccess(); vibrate(50); }
+        // Adjust scores for display
+        const scoreLine = body.querySelector('[data-score-line]');
+        return;
+      }
+      body.querySelectorAll('.ttt-cell').forEach(cell => {
+        cell.onclick = () => {
+          const i = +cell.dataset.i;
+          if (board[i] || done) return;
+          if (mode === 'bot' && turn !== 'X') return;
+          board[i] = turn;
+          const r = checkWin(board);
+          if (r) { draw(); return; }
+          turn = turn === 'X' ? 'O' : 'X';
+          if (mode === 'bot' && turn === 'O') {
+            setTimeout(() => {
+              botMove();
+              const r2 = checkWin(board);
+              if (r2) { draw(); return; }
+              turn = 'X';
+              draw();
+            }, 350);
+            draw();
+          } else {
+            draw();
+          }
+          beepClick();
+        };
+      });
+    };
+    draw();
   }
+};
+
+// -------- 2. CONNECT FOUR --------
+GAMES.connect4 = {
+  title: '🔴 Connect Four',
+  render(body) {
+    const R = 6, C = 7;
+    let board = Array.from({ length: R }, () => Array(C).fill(0));
+    let turn = 1, mode = 'bot', done = false;
+    
+    const drop = (col, player) => {
+      for (let r = R - 1; r >= 0; r--) {
+        if (board[r][col] === 0) { board[r][col] = player; return r; }
+      }
+      return -1;
+    };
+    
+    const checkWin = () => {
+      for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+        const p = board[r][c];
+        if (!p) continue;
+        const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+        for (const [dr,dc] of dirs) {
+          let ok = true;
+          for (let k = 1; k < 4; k++) {
+            const nr = r + dr*k, nc = c + dc*k;
+            if (nr<0||nr>=R||nc<0||nc>=C||board[nr][nc]!==p) { ok = false; break; }
+          }
+          if (ok) return p;
+        }
+      }
+      if (board[0].every(c => c)) return 'draw';
+      return 0;
+    };
+    
+    const botMove = () => {
+      // simple: try win, block, else random
+      for (let c = 0; c < C; c++) {
+        const r = dropTest(c);
+        if (r >= 0) { board[r][c] = 2; if (checkWin() === 2) return; board[r][c] = 0; }
+      }
+      for (let c = 0; c < C; c++) {
+        const r = dropTest(c);
+        if (r >= 0) { board[r][c] = 1; if (checkWin() === 1) { board[r][c] = 0; board[r][c] = 2; return; } board[r][c] = 0; }
+      }
+      const valid = [];
+      for (let c = 0; c < C; c++) if (dropTest(c) >= 0) valid.push(c);
+      if (!valid.length) return;
+      const c = valid[rand(valid.length)];
+      const r = dropTest(c);
+      board[r][c] = 2;
+    };
+    const dropTest = (c) => {
+      for (let r = R - 1; r >= 0; r--) if (board[r][c] === 0) return r;
+      return -1;
+    };
+    
+    const draw = () => {
+      const w = checkWin();
+      body.innerHTML = `
+        <div class="game-controls">
+          <button class="btn ${mode==='bot'?'btn-primary':''}" data-mode="bot">🤖 vs Bot</button>
+          <button class="btn ${mode==='2p'?'btn-primary':''}" data-mode="2p">👥 2 Pemain</button>
+        </div>
+        <div class="c4-board">
+          ${Array.from({ length: C }).map((_, c) => `<button class="c4-col-btn" data-col="${c}"></button>`).join('')}
+          ${board.flatMap((row, r) => row.map((v, c) => `<div class="c4-cell ${v===1?'p1':v===2?'p2':''}"></div>`)).join('')}
+        </div>
+        <div class="game-status ${w===1||w===2?'win':''}">
+          ${w ? (w === 'draw' ? '🤝 Seri!' : (w === 1 ? '🎉 Pemain 1 (Merah) Menang!' : '🎉 Pemain 2 (Kuning) Menang!')) : 'Giliran: Pemain ' + turn}
+        </div>
+        ${w ? '<button class="btn btn-primary" id="c4New" style="margin-top:10px">Main Lagi</button>' : ''}
+      `;
+      body.querySelectorAll('[data-mode]').forEach(b => {
+        b.onclick = () => {
+          mode = b.dataset.mode;
+          board = Array.from({ length: R }, () => Array(C).fill(0));
+          turn = 1; draw();
+        };
+      });
+      if (w) {
+        body.querySelector('#c4New').onclick = () => {
+          board = Array.from({ length: R }, () => Array(C).fill(0));
+          turn = 1; draw();
+        };
+        beepSuccess(); vibrate(50);
+        return;
+      }
+      body.querySelectorAll('.c4-col-btn').forEach(btn => {
+        btn.onclick = () => {
+          const col = +btn.dataset.col;
+          if (done) return;
+          if (mode === 'bot' && turn !== 1) return;
+          const r = drop(col, turn);
+          if (r < 0) return;
+          beepClick();
+          const w2 = checkWin();
+          if (w2) { draw(); return; }
+          turn = turn === 1 ? 2 : 1;
+          if (mode === 'bot' && turn === 2) {
+            draw();
+            setTimeout(() => {
+              botMove();
+              const w3 = checkWin();
+              if (w3) { draw(); return; }
+              turn = 1;
+              draw();
+            }, 400);
+          } else draw();
+        };
+      });
+    };
+    draw();
+  }
+};
+
+// -------- 3. ROCK PAPER SCISSORS --------
+GAMES.rps = {
+  title: '✊ Rock Paper Scissors',
+  render(body) {
+    let mode = 'bot';
+    let p1 = null, p2 = null, phase = 'pick';
+    let score1 = 0, score2 = 0;
+    const choices = ['✊', '✋', '✌️'];
+    const names = ['Batu', 'Kertas', 'Gunting'];
+    const beats = { 0: 2, 1: 0, 2: 1 }; // rock beats scissors, paper beats rock, scissors beats paper
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="game-controls">
+          <button class="btn ${mode==='bot'?'btn-primary':''}" data-mode="bot">🤖 vs Bot</button>
+          <button class="btn ${mode==='2p'?'btn-primary':''}" data-mode="2p">👥 2 Pemain</button>
+        </div>
+        <div style="text-align:center;margin-bottom:10px;font-size:13px;color:var(--text-dim)">
+          Skor: <b style="color:var(--pink)">P1 ${score1}</b> · <b style="color:var(--warn)">${mode==='bot'?'Bot':'P2'} ${score2}</b>
+        </div>
+        <div class="rps-vs">
+          <div class="hand ${p1!==null?'reveal':''}">${p1!==null?choices[p1]:'❓'}</div>
+          <div style="align-self:center;font-size:20px;color:var(--text-dim)">vs</div>
+          <div class="hand ${p2!==null?'reveal':''}">${p2!==null?choices[p2]:'❓'}</div>
+        </div>
+        <div class="game-status" id="rpsStatus">${phase === 'pick' ? 'Pilih tanganmu!' : ''}</div>
+        <div class="rps-choice">
+          ${choices.map((c, i) => `<button class="rps-btn" data-c="${i}">${c}</button>`).join('')}
+        </div>
+        <button class="btn btn-primary" id="rpsNew" style="margin-top:10px">Main Lagi</button>
+      `;
+      body.querySelectorAll('[data-mode]').forEach(b => {
+        b.onclick = () => { mode = b.dataset.mode; p1 = p2 = null; phase = 'pick'; score1 = score2 = 0; draw(); };
+      });
+      body.querySelectorAll('.rps-btn').forEach(b => {
+        b.onclick = () => {
+          if (phase !== 'pick') return;
+          const i = +b.dataset.c;
+          beepClick(); vibrate(20);
+          p1 = i;
+          if (mode === 'bot') {
+            p2 = rand(3);
+            resolve();
+          } else {
+            // 2p: hide p1, wait for p2
+            phase = 'pick2';
+            const orig = p1;
+            p1 = null;
+            draw();
+            const btns = body.querySelectorAll('.rps-btn');
+            btns.forEach(bb => {
+              bb.onclick = () => {
+                p1 = orig;
+                p2 = +bb.dataset.c;
+                resolve();
+              };
+            });
+            $('#rpsStatus').textContent = 'Pemain 2 pilih sekarang';
+          }
+        };
+      });
+      $('#rpsNew').onclick = () => { p1 = p2 = null; phase = 'pick'; draw(); };
+    };
+    
+    const resolve = () => {
+      phase = 'reveal';
+      let msg = '';
+      if (p1 === p2) { msg = '🤝 Seri!'; beepFail(); }
+      else if (beats[p1] === p2) { msg = '🎉 Pemain 1 Menang!'; score1++; beepSuccess(); }
+      else { msg = mode === 'bot' ? '🤖 Bot Menang!' : '🎉 Pemain 2 Menang!'; score2++; beepFail(); }
+      vibrate(50);
+      draw();
+      setTimeout(() => {
+        $('#rpsStatus').textContent = msg;
+        $('#rpsStatus').className = 'game-status win';
+      }, 50);
+    };
+    draw();
+  }
+};
+
+// -------- 4. MEMORY MATCH --------
+GAMES.memory = {
+  title: '🧠 Memory Match',
+  render(body) {
+    const emojis = ['🍎','🍌','🍇','🍓','🍒','🍑','🥝','🍍'];
+    let pairs = 6;
+    let cards = [], flipped = [], matched = 0, moves = 0, lock = false;
+    let mode = 'solo';
+    let score1 = 0, score2 = 0, turn = 1;
+    
+    const init = () => {
+      const chosen = emojis.slice(0, pairs);
+      cards = [...chosen, ...chosen].map(e => ({ emoji: e, matched: false, flipped: false }));
+      cards.sort(() => Math.random() - 0.5);
+      flipped = []; matched = 0; moves = 0; lock = false; score1 = score2 = 0; turn = 1;
+    };
+    
+    const draw = () => {
+      const totalPairs = pairs;
+      body.innerHTML = `
+        <div class="game-controls">
+          <button class="btn ${mode==='solo'?'btn-primary':''}" data-mode="solo">🎯 Solo</button>
+          <button class="btn ${mode==='2p'?'btn-primary':''}" data-mode="2p">👥 2 Pemain</button>
+        </div>
+        ${mode==='2p' ? `<div style="text-align:center;margin-bottom:10px;font-size:13px">
+          <b style="color:var(--pink)">P1: ${score1}</b> · <b style="color:var(--warn)">P2: ${score2}</b>
+          ${matched < totalPairs ? ` · Giliran: <b>P${turn}</b>` : ''}
+        </div>` : ''}
+        <div class="game-status">${matched >= totalPairs ? '🎉 Selesai! ' + moves + ' langkah' : (mode==='solo'?'Langkah: ' + moves + ' · Pasangan: ' + matched + '/' + totalPairs : '')}</div>
+        <div class="memory-board" style="grid-template-columns:repeat(${Math.min(4, cards.length)},1fr)">
+          ${cards.map((c, i) => `<button class="memory-cell ${c.flipped?'flipped':''} ${c.matched?'matched':''}" data-i="${i}">${c.emoji}</button>`).join('')}
+        </div>
+        <button class="btn btn-primary" id="memNew" style="margin-top:10px">Main Lagi</button>
+      `;
+      body.querySelectorAll('[data-mode]').forEach(b => {
+        b.onclick = () => { mode = b.dataset.mode; init(); draw(); };
+      });
+      $('#memNew').onclick = () => { init(); draw(); };
+      
+      body.querySelectorAll('.memory-cell').forEach(cell => {
+        cell.onclick = () => {
+          const i = +cell.dataset.i;
+          const card = cards[i];
+          if (lock || card.matched || card.flipped) return;
+          card.flipped = true;
+          beepClick(); vibrate(15);
+          flipped.push(i);
+          draw();
+          
+          if (flipped.length === 2) {
+            moves++;
+            lock = true;
+            const [a, b] = flipped;
+            if (cards[a].emoji === cards[b].emoji) {
+              cards[a].matched = cards[b].matched = true;
+              matched++;
+              flipped = [];
+              lock = false;
+              beepSuccess(); vibrate(30);
+              if (mode === '2p') { if (turn === 1) score1++; else score2++; }
+              setTimeout(draw, 300);
+            } else {
+              beepFail();
+              if (mode === '2p') turn = turn === 1 ? 2 : 1;
+              setTimeout(() => {
+                cards[a].flipped = cards[b].flipped = false;
+                flipped = [];
+                lock = false;
+                draw();
+              }, 800);
+            }
+          }
+        };
+      });
+    };
+    init(); draw();
+  }
+};
+
+// -------- 5. REACTION BATTLE --------
+GAMES.reaction = {
+  title: '⚡ Reaksi Kilat',
+  render(body) {
+    let state = 'idle'; // idle | red | green | done
+    let timer = null;
+    let startTime = 0;
+    let winner = '';
+    let times = [];
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div style="text-align:center;margin-bottom:14px;color:var(--text-dim);font-size:13px">
+          Tap area saat jadi HIJAU. Yang paling cepat menang!
+        </div>
+        <div class="reaction-area ${state}" id="reactionArea">
+          ${state==='idle' ? '🟢<br><span style="font-size:16px">Tap untuk mulai</span>' :
+            state==='red' ? '🔴<br><span style="font-size:16px">TUNGGU...</span>' :
+            state==='green' ? '⚡<br><span style="font-size:16px">TAP SEKARANG!</span>' :
+            '🏆<br><span style="font-size:20px">'+winner+'</span>'}
+        </div>
+        ${times.length ? `<div class="game-status">${times.map(t => `<div>${t.name}: <b>${t.ms} ms</b></div>`).join('')}</div>` : ''}
+        ${state==='done' ? '<button class="btn btn-primary" id="rTry" style="margin-top:10px">Main Lagi</button>' : ''}
+      `;
+      if (state === 'done') {
+        $('#rTry').onclick = () => { state = 'idle'; times = []; draw(); };
+      }
+      $('#reactionArea').onclick = () => {
+        if (state === 'idle') {
+          state = 'red';
+          draw();
+          const delay = 1500 + Math.random() * 3500;
+          timer = setTimeout(() => {
+            state = 'green';
+            startTime = Date.now();
+            draw();
+            vibrate(20);
+            beep(880, 100);
+          }, delay);
+        } else if (state === 'red') {
+          // too early!
+          clearTimeout(timer);
+          beepFail(); vibrate([100, 50, 100]);
+          state = 'done';
+          winner = '❌ Terlalu cepat!';
+          draw();
+        } else if (state === 'green') {
+          const ms = Date.now() - startTime;
+          times.push({ name: 'Waktu', ms });
+          beepSuccess(); vibrate(50);
+          state = 'done';
+          if (ms < 200) winner = '🚀 Super cepat!';
+          else if (ms < 300) winner = '⚡ Cepat!';
+          else if (ms < 500) winner = '👍 Lumayan';
+          else winner = '🐢 Masih bisa lebih cepat';
+          draw();
+        }
+      };
+    };
+    draw();
+  }
+};
+
+// -------- 6. WHACK A MOLE --------
+GAMES.whack = {
+  title: '🔨 Whack a Mole',
+  render(body) {
+    let score = 0, time = 30, running = false, timer = null, moleTimer = null;
+    let activeCells = new Set();
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num" id="wScore">${score}</div><div class="lbl">Skor</div></div>
+          <div class="stat"><div class="num" id="wTime">${time}</div><div class="lbl">Detik</div></div>
+        </div>
+        <div class="whack-grid">
+          ${Array.from({ length: 9 }).map((_, i) => `<button class="whack-cell ${activeCells.has(i)?'active':''}" data-i="${i}">${activeCells.has(i)?'🐹':''}</button>`).join('')}
+        </div>
+        <div class="game-status">${!running && time>0 ? 'Tap mulai untuk main' : running ? 'Pukul tikus-tikus!' : '⏱ Waktu habis! Skor: ' + score}</div>
+        ${!running ? '<button class="btn btn-primary" id="whackStart" style="margin-top:10px">' + (time === 30 ? '▶ Mulai' : '🔄 Main Lagi') + '</button>' : ''}
+      `;
+      if (!running) {
+        $('#whackStart').onclick = startGame;
+      }
+      body.querySelectorAll('.whack-cell').forEach(cell => {
+        cell.onclick = () => {
+          if (!running) return;
+          const i = +cell.dataset.i;
+          if (activeCells.has(i)) {
+            score += 10;
+            activeCells.delete(i);
+            beep(1200, 60, 'sine', 0.3);
+            vibrate(20);
+            $('#wScore').textContent = score;
+            cell.classList.remove('active');
+            cell.textContent = '';
+          }
+        };
+      });
+    };
+    
+    const startGame = () => {
+      score = 0; time = 30; running = true; activeCells.clear();
+      draw();
+      timer = setInterval(() => {
+        time--;
+        const el = $('#wTime');
+        if (el) el.textContent = time;
+        if (time <= 0) stopGame();
+      }, 1000);
+      moleTimer = setInterval(() => {
+        if (!running) return;
+        if (activeCells.size < 3) {
+          const empty = [];
+          for (let i = 0; i < 9; i++) if (!activeCells.has(i)) empty.push(i);
+          if (empty.length) {
+            const i = empty[rand(empty.length)];
+            activeCells.add(i);
+            const cell = body.querySelector(`[data-i="${i}"]`);
+            if (cell) { cell.classList.add('active'); cell.textContent = '🐹'; }
+            setTimeout(() => {
+              if (activeCells.has(i)) {
+                activeCells.delete(i);
+                const c2 = body.querySelector(`[data-i="${i}"]`);
+                if (c2) { c2.classList.remove('active'); c2.textContent = ''; }
+              }
+            }, 1200);
+          }
+        }
+      }, 500);
+    };
+    
+    const stopGame = () => {
+      running = false;
+      clearInterval(timer);
+      clearInterval(moleTimer);
+      beepSuccess();
+      vibrate([80, 40, 80]);
+      draw();
+    };
+    
+    draw();
+  }
+};
+
+// -------- 7. 2048 --------
+GAMES.g2048 = {
+  title: '🔢 2048',
+  render(body) {
+    let board = Array(16).fill(0);
+    let score = 0;
+    let done = false;
+    
+    const addRandom = () => {
+      const empty = board.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+      if (!empty.length) return;
+      const i = empty[rand(empty.length)];
+      board[i] = Math.random() < 0.9 ? 2 : 4;
+    };
+    
+    const slide = (line) => {
+      const arr = line.filter(v => v);
+      const result = [];
+      let gained = 0;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === arr[i+1]) { result.push(arr[i]*2); gained += arr[i]*2; i++; }
+        else result.push(arr[i]);
+      }
+      while (result.length < 4) result.push(0);
+      return { result, gained };
+    };
+    
+    const move = (dir) => {
+      let changed = false, gained = 0;
+      const idx = (r,c) => r*4+c;
+      if (dir === 'left' || dir === 'right') {
+        for (let r = 0; r < 4; r++) {
+          let line = [];
+          for (let c = 0; c < 4; c++) line.push(board[idx(r,c)]);
+          if (dir === 'right') line.reverse();
+          const { result, gained: g } = slide(line);
+          if (dir === 'right') result.reverse();
+          for (let c = 0; c < 4; c++) {
+            if (board[idx(r,c)] !== result[c]) changed = true;
+            board[idx(r,c)] = result[c];
+          }
+          gained += g;
+        }
+      } else {
+        for (let c = 0; c < 4; c++) {
+          let line = [];
+          for (let r = 0; r < 4; r++) line.push(board[idx(r,c)]);
+          if (dir === 'down') line.reverse();
+          const { result, gained: g } = slide(line);
+          if (dir === 'down') result.reverse();
+          for (let r = 0; r < 4; r++) {
+            if (board[idx(r,c)] !== result[r]) changed = true;
+            board[idx(r,c)] = result[r];
+          }
+          gained += g;
+        }
+      }
+      if (changed) { score += gained; addRandom(); beepClick(); draw(); }
+      if (gained > 0) beep(1000, 60, 'sine', 0.2);
+    };
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num">${score}</div><div class="lbl">Skor</div></div>
+          <div class="stat"><div class="num">${Math.max(...board)}</div><div class="lbl">Tertinggi</div></div>
+        </div>
+        <div class="g2048-board">
+          ${board.map(v => `<div class="g2048-cell" data-v="${v}">${v || ''}</div>`).join('')}
+        </div>
+        <div class="btn-row-3" style="margin-top:14px;grid-template-columns:1fr;max-width:200px;margin-left:auto;margin-right:auto">
+          <button class="btn" data-mv="up" style="grid-column:1">⬆</button>
+        </div>
+        <div class="btn-row-3" style="grid-template-columns:1fr 1fr 1fr;max-width:200px;margin:8px auto 0">
+          <button class="btn" data-mv="left">⬅</button>
+          <button class="btn" data-mv="down">⬇</button>
+          <button class="btn" data-mv="right">➡</button>
+        </div>
+        <button class="btn btn-primary" id="g2048New" style="margin-top:14px">🔄 Main Baru</button>
+      `;
+      body.querySelectorAll('[data-mv]').forEach(b => {
+        b.onclick = () => move(b.dataset.mv);
+      });
+      $('#g2048New').onclick = () => {
+        board = Array(16).fill(0); score = 0;
+        addRandom(); addRandom(); draw();
+      };
+    };
+    
+    addRandom(); addRandom(); draw();
+  }
+};
+
+// -------- 8. SLIDING PUZZLE --------
+GAMES.slide = {
+  title: '🧩 Sliding Puzzle',
+  render(body) {
+    let tiles = [], moves = 0, done = false;
+    
+    const solved = () => tiles.every((v, i) => v === i + 1 || (i === 8 && v === 0));
+    
+    const shuffle = () => {
+      tiles = [1,2,3,4,5,6,7,8,0];
+      // shuffle by random moves
+      for (let i = 0; i < 100; i++) {
+        const emptyIdx = tiles.indexOf(0);
+        const r = Math.floor(emptyIdx / 3), c = emptyIdx % 3;
+        const neighbors = [];
+        if (r > 0) neighbors.push(emptyIdx - 3);
+        if (r < 2) neighbors.push(emptyIdx + 3);
+        if (c > 0) neighbors.push(emptyIdx - 1);
+        if (c < 2) neighbors.push(emptyIdx + 1);
+        const pick = neighbors[rand(neighbors.length)];
+        [tiles[emptyIdx], tiles[pick]] = [tiles[pick], tiles[emptyIdx]];
+      }
+      // ensure not solved
+      if (solved()) shuffle();
+    };
+    
+    const draw = () => {
+      done = solved();
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num">${moves}</div><div class="lbl">Langkah</div></div>
+          <div class="stat"><div class="num">${done ? '✅' : '🧩'}</div><div class="lbl">${done ? 'Selesai!' : 'Susun 1-8'}</div></div>
+        </div>
+        <div class="slide-board">
+          ${tiles.map((v, i) => `<button class="slide-cell ${v===0?'empty':''}" data-i="${i}">${v || ''}</button>`).join('')}
+        </div>
+        <button class="btn btn-primary" id="slideNew" style="margin-top:14px">🔄 Acak Ulang</button>
+      `;
+      body.querySelectorAll('.slide-cell').forEach(cell => {
+        cell.onclick = () => {
+          if (done) return;
+          const i = +cell.dataset.i;
+          if (tiles[i] === 0) return;
+          const emptyIdx = tiles.indexOf(0);
+          const ri = Math.floor(i/3), ci = i%3;
+          const re = Math.floor(emptyIdx/3), ce = emptyIdx%3;
+          if (Math.abs(ri - re) + Math.abs(ci - ce) === 1) {
+            [tiles[i], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[i]];
+            moves++;
+            beepClick(); vibrate(10);
+            draw();
+            if (solved()) { beepSuccess(); vibrate(100); }
+          }
+        };
+      });
+      $('#slideNew').onclick = () => { shuffle(); moves = 0; draw(); };
+    };
+    shuffle(); draw();
+  }
+};
+
+// -------- 9. SIMON SAYS --------
+GAMES.simon = {
+  title: '🎨 Simon Says',
+  render(body) {
+    let sequence = [];
+    let playerIdx = 0;
+    let showing = false;
+    let score = 0;
+    let highScore = 0;
+    
+    const flashBtn = (i) => {
+      const btn = body.querySelector(`[data-c="${i}"]`);
+      if (!btn) return;
+      btn.classList.add('flash');
+      beep(200 + i * 150, 300, 'sine', 0.3);
+      setTimeout(() => btn.classList.remove('flash'), 350);
+    };
+    
+    const playSequence = async () => {
+      showing = true;
+      playerIdx = 0;
+      await sleep(400);
+      for (const i of sequence) {
+        flashBtn(i);
+        await sleep(500);
+      }
+      showing = false;
+      updateStatus();
+    };
+    
+    const newRound = () => {
+      sequence.push(rand(4));
+      playSequence();
+    };
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num">${score}</div><div class="lbl">Skor</div></div>
+          <div class="stat"><div class="num">${highScore}</div><div class="lbl">Tertinggi</div></div>
+        </div>
+        <div class="game-status" id="simonStatus">Ingat pola warnanya!</div>
+        <div class="simon-board">
+          <button class="simon-btn" data-c="0"></button>
+          <button class="simon-btn" data-c="1"></button>
+          <button class="simon-btn" data-c="2"></button>
+          <button class="simon-btn" data-c="3"></button>
+        </div>
+        <button class="btn btn-primary" id="simonStart" style="margin-top:14px">▶ Mulai / Ulang</button>
+      `;
+      body.querySelectorAll('.simon-btn').forEach(btn => {
+        btn.onclick = () => {
+          if (showing) return;
+          const i = +btn.dataset.c;
+          flashBtn(i);
+          if (i === sequence[playerIdx]) {
+            playerIdx++;
+            if (playerIdx >= sequence.length) {
+              score++;
+              if (score > highScore) highScore = score;
+              updateStatus();
+              setTimeout(newRound, 800);
+            }
+          } else {
+            beepFail(); vibrate([100, 50, 100]);
+            $('#simonStatus').textContent = '❌ Salah! Skor: ' + score;
+            $('#simonStatus').className = 'game-status lose';
+            sequence = []; playerIdx = 0;
+          }
+        };
+      });
+      $('#simonStart').onclick = () => {
+        sequence = []; score = 0; playerIdx = 0;
+        newRound();
+      };
+    };
+    
+    const updateStatus = () => {
+      const st = $('#simonStatus');
+      if (st) {
+        st.textContent = sequence.length ? `Pola ke-${sequence.length} · Skor: ${score}` : 'Ingat pola warnanya!';
+      }
+    };
+    draw();
+  }
+};
+
+// -------- 10. LIGHTS OUT --------
+GAMES.lightsout = {
+  title: '💡 Lights Out',
+  render(body) {
+    let grid = [];
+    let moves = 0;
+    
+    const init = () => {
+      grid = Array.from({ length: 5 }, () => Array(5).fill(0));
+      // Start with random but solvable - use 5 random toggles
+      for (let k = 0; k < 8; k++) {
+        toggleTile(rand(5), rand(5), false);
+      }
+      moves = 0;
+    };
+    const toggleTile = (r, c, doMove = true) => {
+      const dirs = [[0,0],[-1,0],[1,0],[0,-1],[0,1]];
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5) {
+          grid[nr][nc] = grid[nr][nc] ? 0 : 1;
+        }
+      }
+      if (doMove) moves++;
+    };
+    
+    const isSolved = () => grid.every(row => row.every(v => v === 0));
+    
+    const draw = () => {
+      const solved = isSolved();
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num">${moves}</div><div class="lbl">Langkah</div></div>
+          <div class="stat"><div class="num">${solved ? '✅' : '💡'}</div><div class="lbl">${solved ? 'Selesai!' : 'Matikan semua'}</div></div>
+        </div>
+        <div class="lo-board">
+          ${grid.map((row, r) => row.map((v, c) => `<button class="lo-cell ${v?'on':''}" data-r="${r}" data-c="${c}"></button>`).join('')).join('')}
+        </div>
+        <button class="btn btn-primary" id="loNew" style="margin-top:14px">🔄 Acak Ulang</button>
+      `;
+      body.querySelectorAll('.lo-cell').forEach(cell => {
+        cell.onclick = () => {
+          if (isSolved()) return;
+          toggleTile(+cell.dataset.r, +cell.dataset.c);
+          beepClick(); vibrate(10);
+          draw();
+          if (isSolved()) { beepSuccess(); vibrate(100); }
+        };
+      });
+      $('#loNew').onclick = () => { init(); draw(); };
+    };
+    init(); draw();
+  }
+};
+
+// -------- 11. MATH BATTLE --------
+GAMES.math = {
+  title: '➗ Math Battle',
+  render(body) {
+    let mode = 'bot'; // 'bot' | '2p'
+    let score1 = 0, score2 = 0;
+    let current = { a: 0, b: 0, op: '+', answer: 0 };
+    let answered = false;
+    let turn = 1;
+    
+    const newProblem = () => {
+      const ops = ['+', '-', '×'];
+      const op = ops[rand(3)];
+      let a, b, answer;
+      if (op === '+') { a = randInt(10, 50); b = randInt(10, 50); answer = a + b; }
+      else if (op === '-') { a = randInt(20, 60); b = randInt(5, 20); answer = a - b; }
+      else { a = randInt(2, 12); b = randInt(2, 12); answer = a * b; }
+      current = { a, b, op, answer };
+      answered = false;
+    };
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="game-controls">
+          <button class="btn ${mode==='bot'?'btn-primary':''}" data-mode="bot">🤖 vs Bot</button>
+          <button class="btn ${mode==='2p'?'btn-primary':''}" data-mode="2p">👥 2 Pemain</button>
+        </div>
+        <div class="math-players">
+          <div class="math-player ${turn===1?'active':''}">
+            <div class="name">${mode==='bot'?'Kamu':'Pemain 1'}</div>
+            <div class="score">${score1}</div>
+          </div>
+          <div class="math-player ${turn===2?'active':''}">
+            <div class="name">${mode==='bot'?'Bot':'Pemain 2'}</div>
+            <div class="score">${score2}</div>
+          </div>
+        </div>
+        <div class="math-problem">${current.a} ${current.op} ${current.b} = ?</div>
+        <div class="math-input-row">
+          <input type="number" id="mathAns" inputmode="numeric" placeholder="?" autocomplete="off">
+          <button class="btn btn-primary" id="mathSubmit" style="width:auto;padding:0 22px">✓</button>
+        </div>
+        <div class="game-status" id="mathStatus">Giliran: ${turn === 1 ? (mode==='bot'?'Kamu':'P1') : (mode==='bot'?'Bot':'P2')}</div>
+        <button class="btn btn-primary" id="mathNew" style="margin-top:14px">🔄 Soal Baru</button>
+      `;
+      body.querySelectorAll('[data-mode]').forEach(b => {
+        b.onclick = () => { mode = b.dataset.mode; score1 = score2 = 0; turn = 1; newProblem(); draw(); };
+      });
+      const input = $('#mathAns');
+      const submit = () => {
+        if (answered) return;
+        const v = parseInt(input.value);
+        if (isNaN(v)) return;
+        answered = true;
+        if (v === current.answer) {
+          beepSuccess(); vibrate(50);
+          if (turn === 1) score1++; else score2++;
+          $('#mathStatus').textContent = '✅ Benar! +1';
+          $('#mathStatus').className = 'game-status win';
+        } else {
+          beepFail(); vibrate(50);
+          $('#mathStatus').textContent = '❌ Salah! Jawaban: ' + current.answer;
+          $('#mathStatus').className = 'game-status lose';
+        }
+        setTimeout(() => {
+          if (mode === '2p') turn = turn === 1 ? 2 : 1;
+          newProblem();
+          draw();
+        }, 1200);
+      };
+      $('#mathSubmit').onclick = submit;
+      input.onkeydown = e => { if (e.key === 'Enter') submit(); };
+      input.focus();
+      $('#mathNew').onclick = () => { newProblem(); draw(); };
+    };
+    newProblem(); draw();
+  }
+};
+
+// -------- 12. GUESS THE NUMBER --------
+GAMES.guess = {
+  title: '🎲 Tebak Angka',
+  render(body) {
+    let secret = randInt(1, 100);
+    let guesses = [];
+    let done = false;
+    
+    const draw = () => {
+      body.innerHTML = `
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat"><div class="num">${guesses.length}</div><div class="lbl">Tebakan</div></div>
+          <div class="stat"><div class="num">1-100</div><div class="lbl">Rentang</div></div>
+        </div>
+        <div class="guess-log">
+          ${guesses.length ? guesses.map(g => `<div class="item ${g.hint}">${g.val} → ${g.hint === 'correct' ? '✅ Benar!' : g.hint === 'high' ? '⬇ Terlalu tinggi' : '⬆ Terlalu rendah'}</div>`).join('') : '<div style="color:var(--text-dim);text-align:center;padding:20px">Belum ada tebakan. Masukkan angka 1-100.</div>'}
+        </div>
+        ${!done ? `
+          <div class="math-input-row">
+            <input type="number" id="guessInput" inputmode="numeric" placeholder="Tebak..." min="1" max="100">
+            <button class="btn btn-primary" id="guessSubmit" style="width:auto;padding:0 22px">→</button>
+          </div>
+        ` : `<div class="game-status win">🎉 Kamu menang dalam ${guesses.length} tebakan!</div>`}
+        <button class="btn btn-primary" id="guessNew" style="margin-top:14px">🔄 Main Baru</button>
+      `;
+      if (!done) {
+        const input = $('#guessInput');
+        const submit = () => {
+          const v = parseInt(input.value);
+          if (isNaN(v) || v < 1 || v > 100) return toast('1-100 saja');
+          if (guesses.some(g => g.val === v)) return toast('Sudah ditebak');
+          let hint;
+          if (v === secret) { hint = 'correct'; done = true; beepSuccess(); vibrate([80, 40, 80]); }
+          else if (v > secret) { hint = 'high'; beep(400, 100); }
+          else { hint = 'low'; beep(600, 100); }
+          guesses.push({ val: v, hint });
+          draw();
+        };
+        $('#guessSubmit').onclick = submit;
+        input.onkeydown = e => { if (e.key === 'Enter') submit(); };
+        input.focus();
+      }
+      $('#guessNew').onclick = () => {
+        secret = randInt(1, 100); guesses = []; done = false; draw();
+      };
+    };
+    draw();
+  }
+};
+
+// Game grid data
+const GAME_LIST = [
+  { key: 'tictactoe', emoji: '⭕', name: 'Tic Tac Toe', meta: 'Bot / 2P' },
+  { key: 'connect4', emoji: '🔴', name: 'Connect Four', meta: 'Bot / 2P' },
+  { key: 'rps', emoji: '✊', name: 'Rock Paper Scissors', meta: 'Bot / 2P' },
+  { key: 'memory', emoji: '🧠', name: 'Memory Match', meta: 'Solo / 2P' },
+  { key: 'reaction', emoji: '⚡', name: 'Reaksi Kilat', meta: 'Refleks' },
+  { key: 'whack', emoji: '🔨', name: 'Whack a Mole', meta: 'Solo' },
+  { key: 'g2048', emoji: '🔢', name: '2048', meta: 'Puzzle' },
+  { key: 'slide', emoji: '🧩', name: 'Sliding Puzzle', meta: 'Puzzle' },
+  { key: 'simon', emoji: '🎨', name: 'Simon Says', meta: 'Memori' },
+  { key: 'lightsout', emoji: '💡', name: 'Lights Out', meta: 'Puzzle' },
+  { key: 'math', emoji: '➗', name: 'Math Battle', meta: 'Bot / 2P' },
+  { key: 'guess', emoji: '🎲', name: 'Tebak Angka', meta: 'vs Bot' },
+];
+
+function renderGameGrid() {
+  const g = $('#gameGrid');
+  g.innerHTML = GAME_LIST.map(game => `
+    <button class="game-card" data-game="${game.key}">
+      <span class="emoji">${game.emoji}</span>
+      <div class="name">${game.name}</div>
+      <div class="meta">${game.meta}</div>
+    </button>
+  `).join('');
+  g.querySelectorAll('[data-game]').forEach(card => {
+    card.onclick = () => { beepClick(); openGame(card.dataset.game); };
+  });
 }
 
-function formatBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
-  return (b/1024/1024).toFixed(1) + ' MB';
-}
-
-// ===== TABS =====
-function bindTabs() {
+// ==================== BIND UI ====================
+function bindUI() {
+  // Tabs
   $$('.tab').forEach(t => {
     t.onclick = () => {
       $$('.tab').forEach(x => x.classList.remove('active'));
       $$('.tab-panel').forEach(x => x.classList.remove('active'));
       t.classList.add('active');
       $('#tab-' + t.dataset.tab).classList.add('active');
+      beepClick();
     };
   });
-}
 
-// ===== BIND ALL =====
-function bindUI() {
-  bindTabs();
-
-  // ---- LISTEN ----
-  $('#listenBtn').onclick = () => {
-    if (S.runtime.listening) {
-      stopListening();
+  // Theme
+  $('#btnTheme').onclick = () => {
+    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.theme = next;
+    $('#btnTheme').textContent = next === 'dark' ? '🌙' : '☀️';
+    S.settings.theme = next;
+    saveState();
+  };
+  
+  // Fullscreen
+  $('#btnFullscreen').onclick = async () => {
+    try {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    } catch(e) {}
+  };
+  
+  // Power
+  $('#powerBtn').onclick = toggleManualLight;
+  $('#btnScreen').onclick = toggleManualLight;
+  $('#btnTorch').onclick = async () => {
+    if (!S.torch.available) { await initTorch(); }
+    if (S.torch.available) {
+      const on = overlay.style.opacity !== '1';
+      await setTorch(on);
+      toast(on ? '🔦 Torch ON' : '🔦 Torch OFF');
     } else {
-      startListening();
+      toast('💡 Pakai mode layar');
+      toggleManualLight();
     }
   };
-  $('#btnTestTrigger').onclick = () => {
-    if (!S.words.length) return toast('📝 Tambah kata dulu');
-    const w = S.words[0];
-    fireTrigger(w, w + ' (tes)');
-    toast('🧪 Tes: ' + w);
-  };
-  $('#btnStopAll').onclick = () => {
-    stopListening();
-    clearFlashTimers();
-    if (S.runtime.audioEl) {
-      try { S.runtime.audioEl.pause(); } catch(e){}
-    }
-    toast('⏹ Semua dihentikan');
-  };
-
-  // ---- WORDS ----
-  $('#btnAddWord').onclick = addWord;
-  $('#wordInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); addWord(); }
-  });
-  $$('[data-quick-word]').forEach(b => {
-    b.onclick = () => {
-      const w = b.dataset.quickWord.toLowerCase().trim();
-      if (!S.words.includes(w)) {
-        S.words.push(w);
-        saveState();
-        updateWordsList();
-        updateActiveWordsUI();
-        updateStatsUI();
-        toast('✓ Ditambah: ' + w);
-      } else {
-        toast('Kata sudah ada');
-      }
-    };
-  });
-  $('#matchMode').onchange = e => {
-    S.settings.matchMode = e.target.value;
-    $('#fuzzyGroup').style.display = e.target.value === 'fuzzy' ? '' : 'none';
+  
+  // Color
+  $('#colorPicker').oninput = e => {
+    S.light.color = e.target.value;
+    if (S.light.on) paintLight();
     saveState();
   };
-  $('#fuzzyTolerance').oninput = e => {
-    S.settings.fuzzyTolerance = +e.target.value;
-    $('#fuzzyVal').textContent = e.target.value;
-    saveState();
-  };
-
-  function addWord() {
-    const v = $('#wordInput').value.toLowerCase().trim();
-    if (!v) return toast('Kata kosong');
-    if (S.words.includes(v)) return toast('Kata sudah ada');
-    S.words.push(v);
-    $('#wordInput').value = '';
-    saveState();
-    updateWordsList();
-    updateActiveWordsUI();
-    updateStatsUI();
-    toast('✓ Ditambah: ' + v);
-  }
-
-  // ---- AUDIO ----
-  $('#audioFile').onchange = e => {
-    const f = e.target.files[0];
-    if (f) setAudioFromFile(f);
-  };
-  $('#btnLoadUrl').onclick = () => {
-    const url = $('#audioUrl').value.trim();
-    if (!url) return toast('URL kosong');
-    setAudioFromUrl(url);
-  };
-  $('#btnPreviewAudio').onclick = () => {
-    if (!S.audio.url) return toast('Belum ada audio');
-    const el = getAudioEl();
-    el.src = S.audio.url;
-    el.volume = S.settings.volume;
-    el.currentTime = 0;
-    el.play().catch(e => toast('❌ ' + e.message));
-  };
-  $('#volume').oninput = e => {
-    S.settings.volume = +e.target.value / 100;
-    $('#volumeVal').textContent = e.target.value + '%';
-    saveState();
-  };
-  $('#repeat').oninput = e => {
-    S.settings.repeat = +e.target.value;
-    $('#repeatVal').textContent = e.target.value + 'x';
-    saveState();
-  };
-  $('#swAudioOn').onclick = e => toggleSwitch(e.currentTarget, 'audioOn');
-  $('#swPauseMic').onclick = e => toggleSwitch(e.currentTarget, 'pauseWhilePlay');
-  $('#swLightOn').onclick = e => toggleSwitch(e.currentTarget, 'lightOn');
-  $('#swVibrate').onclick = e => toggleSwitch(e.currentTarget, 'vibrate');
-  $('#swTts').onclick = e => toggleSwitch(e.currentTarget, 'ttsOn');
-  $('#swContinuous').onclick = e => toggleSwitch(e.currentTarget, 'continuous');
-  $('#swWake').onclick = async e => {
-    toggleSwitch(e.currentTarget, 'wakeLock');
-    if (S.settings.wakeLock) await requestWakeLock();
-    else releaseWakeLock();
-  };
-
-  // ---- LIGHT ----
-  $('#flashMode').onchange = e => {
-    S.settings.flashMode = e.target.value;
-    saveState();
-    if (e.target.value === 'torch' || e.target.value === 'both') initTorch();
-  };
-  $('#flashDur').oninput = e => {
-    S.settings.flashDuration = +e.target.value;
-    const d = +e.target.value;
-    $('#flashDurVal').textContent = d < 1000 ? d + ' ms' : (d/1000).toFixed(1) + ' detik';
-    saveState();
-  };
-  $('#strobeSpeed').oninput = e => {
-    S.settings.strobeSpeed = +e.target.value;
-    const labels = ['Sangat Lambat','Lambat','Lambat','Sedang','Sedang','Sedang','Cepat','Cepat','Sangat Cepat','Turbo'];
-    $('#strobeSpeedVal').textContent = labels[+e.target.value - 1] || 'Sedang';
-    saveState();
-  };
-  $('#flashColor').oninput = e => {
-    S.settings.flashColor = e.target.value;
-    saveState();
-  };
-  $('#btnTestLight').onclick = () => {
-    if (!S.runtime.torch.available) initTorch();
-    doFlash();
-    vibrate(30);
-  };
-  $('#btnStopLight').onclick = () => {
-    clearFlashTimers();
-    toast('⏹ Lampu dimatikan');
-  };
-
+  
   // Color presets
-  const colors = ['#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#00ffff','#ff00ff','#ff8800','#ff69b4'];
-  const cp = $('#flashColorPresets');
+  const colors = ['#ffffff','#ff0000','#ff8800','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#ff69b4','#8b00ff'];
+  const cp = $('#colorPresets');
   colors.forEach(c => {
     const b = document.createElement('button');
     b.className = 'color-preset';
     b.style.background = c;
     b.onclick = () => {
-      S.settings.flashColor = c;
-      $('#flashColor').value = c;
+      S.light.color = c;
+      $('#colorPicker').value = c;
+      if (S.light.on) paintLight();
       saveState();
+      beepClick();
     };
     cp.appendChild(b);
   });
-
-  // ---- HISTORY ----
-  $('#btnClearHistory').onclick = () => {
-    if (!confirm('Hapus semua riwayat?')) return;
-    S.history = [];
-    S.stats.triggers = 0;
-    saveState();
-    updateHistoryUI();
-    updateStatsUI();
-    toast('🗑 Riwayat dihapus');
-  };
-  $('#btnExportHistory').onclick = () => {
-    if (!S.history.length) return toast('Riwayat kosong');
-    const text = S.history.map(h => {
-      const d = new Date(h.time).toLocaleString('id-ID');
-      return `${d}\t${h.word}\t"${h.transcript}"`;
-    }).join('\n');
-    const blob = new Blob([text], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'voicetrigger-history.txt';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    toast('📤 Ekspor selesai');
-  };
-
-  // ---- SETTINGS ----
-  $('#langSelect').onchange = e => {
-    S.settings.lang = e.target.value;
-    saveState();
-    if (S.runtime.listening) {
-      stopListening();
-      setTimeout(() => startListening(), 500);
-    }
-  };
-  $('#cooldown').oninput = e => {
-    S.settings.cooldown = +e.target.value;
-    $('#cooldownVal').textContent = e.target.value + ' detik';
-    saveState();
-  };
-  $('#btnSaveAll').onclick = () => {
-    saveState();
-    toast('💾 Semua tersimpan');
-  };
-  $('#btnLoadAll').onclick = () => {
-    loadState();
-    syncAllUI();
-    toast('📂 Dimuat');
-  };
-  $('#btnExportAll').onclick = () => {
-    const data = {
-      words: S.words,
-      settings: S.settings,
-      stats: S.stats,
-      history: S.history,
-      exported: new Date().toISOString(),
+  
+  // Quick colors
+  $$('[data-quick]').forEach(b => {
+    b.onclick = () => {
+      S.light.color = b.dataset.quick;
+      $('#colorPicker').value = b.dataset.quick;
+      if (S.light.on) paintLight();
+      saveState();
+      beepClick();
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'voicetrigger-backup.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    toast('📤 Backup terunduh');
+  });
+  
+  // Brightness
+  $('#brightness').oninput = e => {
+    S.light.brightness = +e.target.value;
+    $('#brightnessVal').textContent = e.target.value + '%';
+    if (S.light.on) paintLight();
+    saveState();
   };
-  $('#btnImportAll').onclick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = async e => {
-      const f = e.target.files[0];
-      if (!f) return;
-      try {
-        const text = await f.text();
-        const d = JSON.parse(text);
-        if (d.words) S.words = d.words;
-        if (d.settings) S.settings = { ...S.settings, ...d.settings };
-        if (d.stats) S.stats = d.stats;
-        if (d.history) S.history = d.history;
-        saveState();
-        syncAllUI();
-        toast('📥 Berhasil impor');
-      } catch(err) { toast('❌ File tidak valid'); }
+  
+  // Strobe
+  $('#onMs').oninput = e => {
+    S.strobe.onMs = +e.target.value;
+    $('#onMsVal').textContent = e.target.value + ' ms';
+    updateFreq();
+  };
+  $('#offMs').oninput = e => {
+    S.strobe.offMs = +e.target.value;
+    $('#offMsVal').textContent = e.target.value + ' ms';
+    updateFreq();
+  };
+  $$('[data-strobe]').forEach(b => {
+    b.onclick = () => {
+      const [on, off] = b.dataset.strobe.split(',').map(Number);
+      S.strobe.onMs = on;
+      S.strobe.offMs = off;
+      $('#onMs').value = on;
+      $('#offMs').value = off;
+      $('#onMsVal').textContent = on + ' ms';
+      $('#offMsVal').textContent = off + ' ms';
+      updateFreq();
     };
-    input.click();
+  });
+  $('#btnStrobe').onclick = () => {
+    if (S.strobe.on) { stopStrobe(); return; }
+    startStrobe();
   };
-  $('#btnTheme').onclick = () => {
-    const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.body.dataset.theme = next;
-    S.settings.theme = next;
-    $('#btnTheme').textContent = next === 'dark' ? '🌙 Mode Gelap' : '☀️ Mode Terang';
+  const updateFreq = () => {
+    const freq = 1000 / (S.strobe.onMs + S.strobe.offMs);
+    $('#freqVal').textContent = freq.toFixed(1) + ' Hz';
+  };
+  updateFreq();
+  
+  // Sound
+  $('#btnMic').onclick = async () => {
+    const ok = await enableMic();
+    if (ok) $('#btnMic').textContent = '🎤 Mic Aktif';
+  };
+  $('#threshold').oninput = e => {
+    S.sound.threshold = +e.target.value / 100;
+    $('#thresholdVal').textContent = e.target.value + '%';
+    $('#meterThresh').style.left = e.target.value + '%';
+  };
+  $('#reactDur').oninput = e => {
+    S.sound.reactDur = +e.target.value;
+    $('#reactDurVal').textContent = e.target.value + ' ms';
+  };
+  $('#btnReactOn').onclick = startReactMode;
+  $('#swReactLight').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.sound.reactLight = e.currentTarget.classList.contains('on');
+  };
+  $('#swReactBeep').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.sound.reactBeep = e.currentTarget.classList.contains('on');
+  };
+  $('#swReactVibrate').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.sound.reactVibrate = e.currentTarget.classList.contains('on');
+  };
+  
+  // Words
+  $('#btnAddWord').onclick = addWord;
+  $('#wordInput').onkeydown = e => { if (e.key === 'Enter') addWord(); };
+  
+  // Settings
+  $('#swWake').onclick = async e => {
+    e.currentTarget.classList.toggle('on');
+    S.settings.wakeLock = e.currentTarget.classList.contains('on');
+    saveState();
+    if (S.settings.wakeLock) await requestWake();
+    else releaseWake();
+  };
+  $('#swVibrate').onclick = e => {
+    e.currentTarget.classList.toggle('on');
+    S.settings.vibrate = e.currentTarget.classList.contains('on');
+    saveState();
+  };
+  $('#swLightTheme').onclick = () => {
+    const sw = $('#swLightTheme');
+    sw.classList.toggle('on');
+    const isLight = sw.classList.contains('on');
+    document.body.dataset.theme = isLight ? 'light' : 'dark';
+    $('#btnTheme').textContent = isLight ? '☀️' : '🌙';
+    S.settings.theme = isLight ? 'light' : 'dark';
     saveState();
   };
   $('#btnReset').onclick = () => {
-    if (!confirm('Reset SEMUA data (kata, pengaturan, riwayat)?')) return;
-    localStorage.removeItem(STORE_KEY);
+    if (!confirm('Reset semua data?')) return;
+    localStorage.removeItem(STORE);
     location.reload();
   };
+  
+  // Game modal
+  $('#gameClose').onclick = closeGame;
 }
 
-function toggleSwitch(el, key) {
-  el.classList.toggle('on');
-  S.settings[key] = el.classList.contains('on');
-  saveState();
+async function requestWake() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    S.wakeObj = await navigator.wakeLock.request('screen');
+    S.wakeObj.addEventListener('release', () => { S.wakeObj = null; });
+  } catch(e) {}
+}
+function releaseWake() {
+  if (S.wakeObj) try { S.wakeObj.release(); } catch(e){}
+  S.wakeObj = null;
 }
 
-// ===== SYNC UI =====
-function syncAllUI() {
-  // Words
-  updateWordsList();
-  updateActiveWordsUI();
-  // Match mode
-  $('#matchMode').value = S.settings.matchMode;
-  $('#fuzzyGroup').style.display = S.settings.matchMode === 'fuzzy' ? '' : 'none';
-  $('#fuzzyTolerance').value = S.settings.fuzzyTolerance;
-  $('#fuzzyVal').textContent = S.settings.fuzzyTolerance;
-  // Audio
-  updateAudioUI();
-  $('#volume').value = S.settings.volume * 100;
-  $('#volumeVal').textContent = Math.round(S.settings.volume*100) + '%';
-  $('#repeat').value = S.settings.repeat;
-  $('#repeatVal').textContent = S.settings.repeat + 'x';
-  // Switches
-  setSwitch('#swAudioOn', S.settings.audioOn);
-  setSwitch('#swPauseMic', S.settings.pauseWhilePlay);
-  setSwitch('#swLightOn', S.settings.lightOn);
-  setSwitch('#swVibrate', S.settings.vibrate);
-  setSwitch('#swTts', S.settings.ttsOn);
-  setSwitch('#swWake', S.settings.wakeLock);
-  setSwitch('#swContinuous', S.settings.continuous);
+// ==================== INIT ====================
+function syncUI() {
   // Light
-  $('#flashMode').value = S.settings.flashMode;
-  $('#flashDur').value = S.settings.flashDuration;
-  const d = S.settings.flashDuration;
-  $('#flashDurVal').textContent = d < 1000 ? d + ' ms' : (d/1000).toFixed(1) + ' detik';
-  $('#strobeSpeed').value = S.settings.strobeSpeed;
-  $('#flashColor').value = S.settings.flashColor;
+  $('#colorPicker').value = S.light.color;
+  $('#brightness').value = S.light.brightness;
+  $('#brightnessVal').textContent = S.light.brightness + '%';
   // Settings
-  $('#langSelect').value = S.settings.lang;
-  $('#cooldown').value = S.settings.cooldown;
-  $('#cooldownVal').textContent = S.settings.cooldown + ' detik';
-  // Theme
-  document.body.dataset.theme = S.settings.theme;
-  $('#btnTheme').textContent = S.settings.theme === 'dark' ? '🌙 Mode Gelap' : '☀️ Mode Terang';
-  // Stats
+  if (S.settings.theme === 'light') {
+    document.body.dataset.theme = 'light';
+    $('#btnTheme').textContent = '☀️';
+    $('#swLightTheme').classList.add('on');
+  }
+  $('#swVibrate').classList.toggle('on', S.settings.vibrate);
+  $('#swWake').classList.toggle('on', S.settings.wakeLock);
+  // Words
+  renderWords();
   updateStatsUI();
-  updateHistoryUI();
 }
 
-function setSwitch(sel, val) {
-  const el = $(sel);
-  if (val) el.classList.add('on');
-  else el.classList.remove('on');
-}
-
-// ===== INIT =====
-function init() {
+async function init() {
   loadState();
   bindUI();
-  syncAllUI();
-  initBattery();
+  syncUI();
+  renderGameGrid();
+  renderWords();
+  updateStatsUI();
   initTorch();
-
-  // Restore flash color / mode visual
-  const sp = (v) => {
-    const labels = ['Sangat Lambat','Lambat','Lambat','Sedang','Sedang','Sedang','Cepat','Cepat','Sangat Cepat','Turbo'];
-    $('#strobeSpeedVal').textContent = labels[v - 1] || 'Sedang';
+  
+  // Listen for voice start once mic fires
+  const startVoice = () => {
+    if (S.words.length) startVoiceRecognition();
   };
-  sp(S.settings.strobeSpeed);
-
-  // Request mic permission on first audio interaction
-  const initAudioOnce = () => {
-    if (S.settings.audioOn || S.settings.lightOn) {
-      // trigger torch init once more in case
-      if (!S.runtime.torch.available) initTorch();
-    }
-    document.removeEventListener('click', initAudioOnce);
+  // Bind add word → auto start if not listening
+  const origAddWord = addWord;
+  addWord = function() {
+    origAddWord();
+    if (!S.listening && S.words.length) startVoiceRecognition();
   };
-  document.addEventListener('click', initAudioOnce, { once: true });
-
-  // Handle visibility
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      // Page hidden - wake lock may auto-release
-    } else {
-      if (S.runtime.listening && !S.runtime.wakeLockObj && S.settings.wakeLock) {
-        requestWakeLock();
-      }
-    }
-  });
-
-  // Warn if unsupported
-  if (!getSpeechRecognition()) {
-    showStatus('error', 'Browser tidak mendukung. Pakai Chrome di Android.');
-  }
-
-  toast('🎙️ Voice Trigger Pro siap');
+  $('#btnAddWord').onclick = addWord;
+  $('#wordInput').onkeydown = e => { if (e.key === 'Enter') addWord(); };
+  
+  toast('🎮 MegaFun siap!');
 }
-
-// Cleanup
-window.addEventListener('beforeunload', () => {
-  if (S.audio.isObjectURL && S.audio.url) URL.revokeObjectURL(S.audio.url);
-  if (S.runtime.torch.stream) S.runtime.torch.stream.getTracks().forEach(t => t.stop());
-  releaseWakeLock();
-});
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
+
+// Cleanup on unload
+window.addEventListener('beforeunload', () => {
+  if (S.sound.stream) S.sound.stream.getTracks().forEach(t => t.stop());
+  if (S.torch.stream) S.torch.stream.getTracks().forEach(t => t.stop());
+  releaseWake();
+  stopStrobe();
+  if (S.listening && S.recognition) try { S.recognition.stop(); } catch(e){}
+});
 
 })();
 </script>
